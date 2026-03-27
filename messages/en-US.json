@@ -1,0 +1,69 @@
+{
+  "app": {
+    "title": "Cafe MD - Markdown Online Tool",
+    "description": "Simple but powerful Markdown online editor"
+  },
+  "editor": {
+    "placeholder": "Start writing your Markdown...",
+    "dropzone": "Drop .md file here",
+    "uploadImage": "Upload Image",
+    "export": "Export",
+    "share": "Share",
+    "mindmap": "Mind Map",
+    "preview": "Preview",
+    "source": "Source",
+    "split": "Split"
+  },
+  "toolbar": {
+    "bold": "Bold",
+    "italic": "Italic",
+    "strike": "Strikethrough",
+    "heading": "Heading",
+    "quote": "Quote",
+    "list": "List",
+    "code": "Code",
+    "link": "Link",
+    "image": "Image",
+    "table": "Table",
+    "undo": "Undo",
+    "redo": "Redo"
+  },
+  "share": {
+    "title": "Share Document",
+    "public": "Public Share",
+    "private": "Private Share",
+    "expires": "Expires",
+    "oneDay": "1 Day",
+    "sevenDays": "7 Days",
+    "thirtyDays": "30 Days",
+    "never": "Never",
+    "copyLink": "Copy Link",
+    "copied": "Copied!",
+    "generating": "Generating...",
+    "success": "Share link generated",
+    "error": "Failed, please retry"
+  },
+  "mindmap": {
+    "title": "Mind Map",
+    "export": "Export SVG",
+    "close": "Close"
+  },
+  "language": {
+    "switch": "Switch Language",
+    "zh-CN": "中文",
+    "en-US": "English"
+  },
+  "theme": {
+    "light": "Light",
+    "dark": "Dark",
+    "system": "System"
+  },
+  "common": {
+    "loading": "Loading...",
+    "error": "Error",
+    "retry": "Retry",
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "save": "Save"
+  }
+}

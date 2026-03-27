@@ -1,0 +1,69 @@
+{
+  "app": {
+    "title": "Cafe MD - Markdown 在线工具",
+    "description": "极简但强大的 Markdown 在线编辑器"
+  },
+  "editor": {
+    "placeholder": "开始编写你的 Markdown...",
+    "dropzone": "拖放 .md 文件到此处",
+    "uploadImage": "上传图片",
+    "export": "导出",
+    "share": "分享",
+    "mindmap": "思维导图",
+    "preview": "预览",
+    "source": "源码",
+    "split": "分栏"
+  },
+  "toolbar": {
+    "bold": "粗体",
+    "italic": "斜体",
+    "strike": "删除线",
+    "heading": "标题",
+    "quote": "引用",
+    "list": "列表",
+    "code": "代码",
+    "link": "链接",
+    "image": "图片",
+    "table": "表格",
+    "undo": "撤销",
+    "redo": "重做"
+  },
+  "share": {
+    "title": "分享文档",
+    "public": "公开分享",
+    "private": "私密分享",
+    "expires": "过期时间",
+    "oneDay": "1天",
+    "sevenDays": "7天",
+    "thirtyDays": "30天",
+    "never": "永不过期",
+    "copyLink": "复制链接",
+    "copied": "已复制！",
+    "generating": "生成中...",
+    "success": "分享链接已生成",
+    "error": "生成失败，请重试"
+  },
+  "mindmap": {
+    "title": "思维导图",
+    "export": "导出 SVG",
+    "close": "关闭"
+  },
+  "language": {
+    "switch": "切换语言",
+    "zh-CN": "中文",
+    "en-US": "English"
+  },
+  "theme": {
+    "light": "亮色",
+    "dark": "暗色",
+    "system": "跟随系统"
+  },
+  "common": {
+    "loading": "加载中...",
+    "error": "出错了",
+    "retry": "重试",
+    "cancel": "取消",
+    "confirm": "确认",
+    "save": "保存"
+  }
+}

@@ -24,3 +24,82 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+.dark {
+  color-scheme: dark;
+}
+
+.vditor {
+  border: none !important;
+}
+
+.vditor-toolbar {
+  border-bottom: 1px solid #e5e7eb !important;
+}
+
+.dark .vditor-toolbar {
+  border-bottom: 1px solid #3f3f46 !important;
+  background: #18181b !important;
+}
+
+.dark .vditor-toolbar__item {
+  color: #d4d4d8 !important;
+}
+
+.dark .vditor-toolbar__item:hover {
+  background: #27272a !important;
+}
+
+.dark .vditor-ir pre.vditor-reset {
+  background: #18181b !important;
+  color: #d4d4d8 !important;
+}
+
+.dark .vditor-sv {
+  background: #18181b !important;
+  color: #d4d4d8 !important;
+}
+
+.dark .vditor-preview {
+  background: #18181b !important;
+  color: #d4d4d8 !important;
+}
+
+.vditor-reset {
+  font-family: var(--font-sans), system-ui, -apple-system, sans-serif;
+}
+
+.dark .vditor-reset {
+  color: #d4d4d8;
+}
+
+.dark .vditor-reset a {
+  color: #60a5fa;
+}
+
+.dark .vditor-reset code:not(.hljs):not(.highlight-chroma) {
+  background: #27272a;
+  border-color: #3f3f46;
+}
+
+.dark .vditor-reset pre code {
+  background: #27272a;
+}
+
+.dark .vditor-reset blockquote {
+  border-left-color: #3f3f46;
+  color: #a1a1aa;
+}
+
+.dark .vditor-reset table thead {
+  background: #27272a;
+}
+
+.dark .vditor-reset table td,
+.dark .vditor-reset table th {
+  border-color: #3f3f46;
+}
+
+.dark .vditor-reset hr {
+  border-color: #3f3f46;
+}
