@@ -4,12 +4,16 @@ import { useTranslations } from 'next-intl';
 import type Vditor from 'vditor';
 
 interface ToolbarProps {
-  onExport: (format: 'html' | 'md' | 'text' | 'pdf') => void;
+  onExport: (format: 'html' | 'md' | 'text' | 'pdf' | 'docx' | 'wechat') => void;
   onShare: () => void;
   onMindmap: () => void;
   onToggleOutline: () => void;
+  onClear: () => void;
+  onSaveLocal: () => void;
   showOutline: boolean;
   vditor: Vditor | null;
+  editMode: 'ir' | 'sv' | 'wysiwyg';
+  onSwitchMode: (mode: 'ir' | 'sv' | 'wysiwyg') => void;
 }
 
 export default function Toolbar({ 
@@ -17,8 +21,12 @@ export default function Toolbar({
   onShare, 
   onMindmap, 
   onToggleOutline,
+  onClear,
+  onSaveLocal,
   showOutline,
-  vditor 
+  vditor,
+  editMode,
+  onSwitchMode
 }: ToolbarProps) {
   const t = useTranslations();
 
@@ -26,6 +34,8 @@ export default function Toolbar({
     if (!vditor) return;
 
     try {
+      vditor.focus();
+      
       switch (action) {
         case 'bold':
           vditor.insertValue('****');
@@ -63,6 +73,52 @@ export default function Toolbar({
   return (
     <div className="flex items-center justify-between px-4 py-2 border-b border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900">
       <div className="flex items-center gap-1">
+        <div className="relative group">
+          <button
+            className="flex items-center gap-1 px-2 py-1.5 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded text-sm text-zinc-700 dark:text-zinc-300"
+            title={t('toolbar.mode')}
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+            </svg>
+            <span className="hidden sm:inline">{t('toolbar.mode')}</span>
+          </button>
+          <div className="absolute left-0 mt-1 w-48 bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-10">
+            <button
+              onClick={() => onSwitchMode('ir')}
+              className={`block w-full px-4 py-2 text-left text-sm ${
+                editMode === 'ir' 
+                  ? 'bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-300' 
+                  : 'text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-700'
+              }`}
+            >
+              ✨ {t('toolbar.modeIR')}
+            </button>
+            <button
+              onClick={() => onSwitchMode('sv')}
+              className={`block w-full px-4 py-2 text-left text-sm ${
+                editMode === 'sv' 
+                  ? 'bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-300' 
+                  : 'text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-700'
+              }`}
+            >
+              ⚖️ {t('toolbar.modeSV')}
+            </button>
+            <button
+              onClick={() => onSwitchMode('wysiwyg')}
+              className={`block w-full px-4 py-2 text-left text-sm ${
+                editMode === 'wysiwyg' 
+                  ? 'bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-300' 
+                  : 'text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-700'
+              }`}
+            >
+              📝 {t('toolbar.modeWYSIWYG')}
+            </button>
+          </div>
+        </div>
+        
+        <div className="w-px h-6 bg-zinc-200 dark:bg-zinc-700 mx-1" />
+        
         <button
           onClick={() => handleToolbarAction('heading')}
           className="flex items-center gap-1 px-2 py-1.5 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded text-sm text-zinc-700 dark:text-zinc-300"
@@ -159,6 +215,28 @@ export default function Toolbar({
 
       <div className="flex items-center gap-2">
         <button
+          onClick={onSaveLocal}
+          className="flex items-center gap-1 px-3 py-1.5 text-sm bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 rounded text-zinc-700 dark:text-zinc-300"
+          title={t('editor.saveLocal')}
+        >
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
+          </svg>
+          <span className="hidden sm:inline">{t('editor.saveLocal')}</span>
+        </button>
+        
+        <button
+          onClick={onClear}
+          className="flex items-center gap-1 px-3 py-1.5 text-sm bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 rounded text-zinc-700 dark:text-zinc-300"
+          title={t('editor.clear')}
+        >
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+          </svg>
+          <span className="hidden sm:inline">{t('editor.clear')}</span>
+        </button>
+        
+        <button
           onClick={onToggleOutline}
           className={`flex items-center gap-1 px-3 py-1.5 text-sm rounded ${
             showOutline 
@@ -183,28 +261,40 @@ export default function Toolbar({
           </button>
           <div className="absolute right-0 mt-1 w-40 bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-10">
             <button
+              onClick={() => onExport('docx')}
+              className="block w-full px-4 py-2 text-left text-sm text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-700"
+            >
+              📄 {t('toolbar.exportDocx')}
+            </button>
+            <button
               onClick={() => onExport('pdf')}
               className="block w-full px-4 py-2 text-left text-sm text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-700"
             >
-              📄 PDF
+              📄 {t('toolbar.exportPdf')}
             </button>
             <button
               onClick={() => onExport('html')}
               className="block w-full px-4 py-2 text-left text-sm text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-700"
             >
-              🌐 HTML
+              🌐 {t('toolbar.exportHtml')}
             </button>
             <button
               onClick={() => onExport('md')}
               className="block w-full px-4 py-2 text-left text-sm text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-700"
             >
-              📝 Markdown
+              📝 {t('toolbar.exportMd')}
             </button>
             <button
               onClick={() => onExport('text')}
               className="block w-full px-4 py-2 text-left text-sm text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-700"
             >
-              📋 Text
+              📋 {t('toolbar.exportText')}
+            </button>
+            <button
+              onClick={() => onExport('wechat')}
+              className="block w-full px-4 py-2 text-left text-sm text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-700"
+            >
+              💬 {t('toolbar.exportWechat')}
             </button>
           </div>
         </div>

@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { nanoid } from 'nanoid';
+import { supabase, isSupabaseConfigured } from '@/lib/supabase';
 
-const shares = new Map<string, {
+const memoryShares = new Map<string, {
   content: string;
   expiresAt: Date | null;
   isPublic: boolean;
@@ -16,14 +17,36 @@ export async function POST(request: NextRequest) {
     const slug = nanoid(8);
     const expiresAt = expiresIn ? new Date(Date.now() + expiresIn * 24 * 60 * 60 * 1000) : null;
 
-    shares.set(slug, {
-      content,
-      expiresAt,
-      isPublic,
-      createdAt: new Date(),
-    });
+    if (isSupabaseConfigured() && supabase) {
+      const { data, error } = await supabase
+        .from('shares')
+        .insert([
+          {
+            slug,
+            content,
+            expires_at: expiresAt?.toISOString(),
+            is_public: isPublic,
+          }
+        ])
+        .select()
+        .single();
 
-    return NextResponse.json({ slug });
+      if (error) {
+        console.error('Supabase insert error:', error);
+        return NextResponse.json({ error: 'Failed to create share' }, { status: 500 });
+      }
+
+      return NextResponse.json({ slug: data.slug });
+    } else {
+      memoryShares.set(slug, {
+        content,
+        expiresAt,
+        isPublic,
+        createdAt: new Date(),
+      });
+
+      return NextResponse.json({ slug });
+    }
   } catch (error) {
     console.error('Share error:', error);
     return NextResponse.json({ error: 'Failed to create share' }, { status: 500 });
@@ -38,16 +61,40 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: 'Slug is required' }, { status: 400 });
   }
 
-  const share = shares.get(slug);
+  if (isSupabaseConfigured() && supabase) {
+    const { data: share, error } = await supabase
+      .from('shares')
+      .select('*')
+      .eq('slug', slug)
+      .single();
 
-  if (!share) {
-    return NextResponse.json({ error: 'Share not found' }, { status: 404 });
+    if (error || !share) {
+      return NextResponse.json({ error: 'Share not found' }, { status: 404 });
+    }
+
+    if (share.expires_at && new Date(share.expires_at) < new Date()) {
+      await supabase.from('shares').delete().eq('slug', slug);
+      return NextResponse.json({ error: 'Share expired' }, { status: 410 });
+    }
+
+    return NextResponse.json({
+      content: share.content,
+      expiresAt: share.expires_at,
+      isPublic: share.is_public,
+      createdAt: share.created_at,
+    });
+  } else {
+    const share = memoryShares.get(slug);
+
+    if (!share) {
+      return NextResponse.json({ error: 'Share not found' }, { status: 404 });
+    }
+
+    if (share.expiresAt && share.expiresAt < new Date()) {
+      memoryShares.delete(slug);
+      return NextResponse.json({ error: 'Share expired' }, { status: 410 });
+    }
+
+    return NextResponse.json(share);
   }
-
-  if (share.expiresAt && share.expiresAt < new Date()) {
-    shares.delete(slug);
-    return NextResponse.json({ error: 'Share expired' }, { status: 410 });
-  }
-
-  return NextResponse.json(share);
 }

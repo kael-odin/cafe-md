@@ -3,15 +3,19 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
 import Vditor from 'vditor';
 import 'vditor/dist/index.css';
-import { useTranslations } from 'next-intl';
+import { useTranslations, useLocale } from 'next-intl';
 import Toolbar from './Toolbar';
 import MindmapModal from './MindmapModal';
 import ShareDialog from './ShareDialog';
+import GuideModal from './GuideModal';
+import imageCompression from 'browser-image-compression';
 
 const STORAGE_KEY = 'cafe-md-content';
+const GUIDE_SHOWN_KEY = 'cafe-md-guide-shown';
 
 export default function VditorEditor() {
   const t = useTranslations();
+  const locale = useLocale();
   const vditorRef = useRef<HTMLDivElement>(null);
   const vditorInstance = useRef<Vditor | null>(null);
   const [content, setContent] = useState('');
@@ -20,6 +24,22 @@ export default function VditorEditor() {
   const [mounted, setMounted] = useState(false);
   const [showDropzone, setShowDropzone] = useState(false);
   const [showOutline, setShowOutline] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
+  const [editMode, setEditMode] = useState<'ir' | 'sv' | 'wysiwyg'>('ir');
+  const [showGuide, setShowGuide] = useState(false);
+
+  useEffect(() => {
+    const guideShown = localStorage.getItem(GUIDE_SHOWN_KEY);
+    if (!guideShown) {
+      setShowGuide(true);
+    }
+  }, []);
+
+  const handleCloseGuide = useCallback(() => {
+    setShowGuide(false);
+    localStorage.setItem(GUIDE_SHOWN_KEY, 'true');
+  }, []);
 
   const saveToLocalStorage = useCallback((value: string) => {
     try {
@@ -38,6 +58,184 @@ export default function VditorEditor() {
     }
   }, []);
 
+  const compressAndUploadImage = useCallback(async (file: File): Promise<string> => {
+    try {
+      setUploading(true);
+      setUploadProgress(10);
+      
+      const options = {
+        maxSizeMB: 0.5,
+        maxWidthOrHeight: 1920,
+        useWebWorker: true,
+        onProgress: (progress: number) => {
+          setUploadProgress(10 + progress * 0.3);
+        },
+      };
+      
+      const compressedFile = await imageCompression(file, options);
+      setUploadProgress(40);
+      
+      const formData = new FormData();
+      formData.append('file', compressedFile);
+      
+      const response = await fetch('/api/upload/image', {
+        method: 'POST',
+        body: formData,
+      });
+      
+      if (!response.ok) {
+        throw new Error('Upload failed');
+      }
+      
+      setUploadProgress(90);
+      const { url } = await response.json();
+      setUploadProgress(100);
+      
+      return url;
+    } catch (error) {
+      console.error('Image upload error:', error);
+      const reader = new FileReader();
+      return new Promise((resolve) => {
+        reader.onload = (e) => {
+          resolve(e.target?.result as string);
+        };
+        reader.readAsDataURL(file);
+      });
+    } finally {
+      setTimeout(() => {
+        setUploading(false);
+        setUploadProgress(0);
+      }, 500);
+    }
+  }, []);
+
+  const getWeChatStyleHTML = useCallback((html: string) => {
+    return `<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>微信样式文档</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Helvetica Neue', Arial, sans-serif;
+      line-height: 1.75;
+      color: #333;
+      background-color: #f7f7f7;
+      padding: 20px;
+    }
+    .wechat-container {
+      max-width: 677px;
+      margin: 0 auto;
+      background-color: #fff;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      overflow: hidden;
+    }
+    .wechat-content {
+      padding: 20px;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      color: #333;
+      margin: 24px 0 16px 0;
+      font-weight: 600;
+    }
+    h1 {
+      font-size: 24px;
+      text-align: center;
+      padding: 20px 0;
+      border-bottom: 1px solid #eee;
+    }
+    h2 {
+      font-size: 20px;
+      border-left: 4px solid #07C160;
+      padding-left: 12px;
+    }
+    h3 {
+      font-size: 18px;
+    }
+    p {
+      margin-bottom: 16px;
+      text-align: justify;
+    }
+    img {
+      max-width: 100%;
+      height: auto;
+      margin: 16px 0;
+      border-radius: 8px;
+    }
+    code {
+      font-family: 'Menlo', 'Monaco', 'Courier New', monospace;
+      background-color: #f5f5f5;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 0.9em;
+    }
+    pre {
+      background-color: #f5f5f5;
+      padding: 16px;
+      border-radius: 8px;
+      overflow-x: auto;
+      margin: 16px 0;
+    }
+    pre code {
+      background: none;
+      padding: 0;
+    }
+    blockquote {
+      border-left: 4px solid #07C160;
+      padding-left: 16px;
+      margin: 16px 0;
+      color: #666;
+      background-color: #f9f9f9;
+      padding: 12px 16px;
+      border-radius: 0 8px 8px 0;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 16px 0;
+    }
+    th, td {
+      padding: 12px;
+      text-align: left;
+      border-bottom: 1px solid #eee;
+    }
+    th {
+      background-color: #f9f9f9;
+      font-weight: 600;
+    }
+    ul, ol {
+      margin: 16px 0;
+      padding-left: 24px;
+    }
+    li {
+      margin-bottom: 8px;
+    }
+    a {
+      color: #07C160;
+      text-decoration: none;
+    }
+    a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <div class="wechat-container">
+    <div class="wechat-content">
+      ${html}
+    </div>
+  </div>
+</body>
+</html>`;
+  }, []);
+
   useEffect(() => {
     setMounted(true);
   }, []);
@@ -49,13 +247,55 @@ export default function VditorEditor() {
 
     vditorInstance.current = new Vditor(vditorRef.current, {
       height: '100%',
-      mode: 'ir',
+      mode: editMode,
       placeholder: t('editor.placeholder'),
       value: savedContent,
       theme: 'classic',
+      lang: locale === 'en-US' ? 'en_US' : 'zh_CN',
       cache: {
         enable: false,
       },
+      customWysiwygToolbar: () => [],
+      toolbar: [
+        'emoji',
+        'headings',
+        'bold',
+        'italic',
+        'strike',
+        'link',
+        '|',
+        'list',
+        'ordered-list',
+        'check',
+        'outdent',
+        'indent',
+        '|',
+        'quote',
+        'line',
+        'code',
+        'inline-code',
+        '|',
+        'upload',
+        'table',
+        '|',
+        'undo',
+        'redo',
+        '|',
+        'edit-mode',
+        'fullscreen',
+        {
+          name: 'more',
+          toolbar: [
+            'both',
+            'preview',
+            'outline',
+            'export',
+            'devtools',
+            'info',
+            'help',
+          ],
+        },
+      ],
       input: (value) => {
         setContent(value);
         saveToLocalStorage(value);
@@ -64,17 +304,13 @@ export default function VditorEditor() {
         url: '/api/upload',
         fieldName: 'file[]',
         accept: 'image/*,.md,.txt',
-        handler: (files) => {
+        handler: async (files) => {
           const file = files[0];
           if (file.type.startsWith('image/')) {
-            const reader = new FileReader();
-            reader.onload = (e) => {
-              const base64 = e.target?.result as string;
-              if (vditorInstance.current) {
-                vditorInstance.current.insertValue(`![${file.name}](${base64})`);
-              }
-            };
-            reader.readAsDataURL(file);
+            const url = await compressAndUploadImage(file);
+            if (vditorInstance.current) {
+              vditorInstance.current.insertValue(`![${file.name}](${url})`);
+            }
           } else if (file.name.endsWith('.md') || file.name.endsWith('.txt')) {
             const reader = new FileReader();
             reader.onload = (e) => {
@@ -115,7 +351,6 @@ export default function VditorEditor() {
           console.error('Upload error:', msg);
         },
       },
-      toolbar: false,
       outline: {
         enable: showOutline,
         position: 'left',
@@ -127,6 +362,8 @@ export default function VditorEditor() {
           footnotes: true,
           autoSpace: true,
           gfmAutoLink: true,
+          paragraphBeginningSpace: false,
+          fixTermTypo: false,
         },
         math: {
           inlineDigit: true,
@@ -150,9 +387,41 @@ export default function VditorEditor() {
           'tada': '🎉',
         },
       },
+      toolbarConfig: {
+        hide: false,
+        pin: false,
+      },
+      counter: {
+        enable: false,
+      },
+      resize: {
+        enable: false,
+      },
       after: () => {
         if (savedContent) {
           setContent(savedContent);
+        }
+        
+        const editorElement = vditorRef.current?.querySelector('.vditor-ir') || 
+                              vditorRef.current?.querySelector('.vditor-sv') ||
+                              vditorRef.current?.querySelector('.vditor-wysiwyg');
+        
+        if (editorElement) {
+          editorElement.addEventListener('paste', (e: Event) => {
+            const clipboardEvent = e as ClipboardEvent;
+            const text = clipboardEvent.clipboardData?.getData('text/plain');
+            
+            if (text && vditorInstance.current) {
+              e.preventDefault();
+              e.stopPropagation();
+              
+              const cleanedText = text.replace(/^```\n/, '').replace(/\n```$/, '');
+              
+              vditorInstance.current.insertValue(cleanedText);
+              setContent(vditorInstance.current.getValue());
+              saveToLocalStorage(vditorInstance.current.getValue());
+            }
+          }, true);
         }
       },
     });
@@ -167,7 +436,17 @@ export default function VditorEditor() {
         vditorInstance.current = null;
       }
     };
-  }, [mounted, showOutline, t, loadFromLocalStorage, saveToLocalStorage]);
+  }, [mounted, showOutline, editMode, locale, t, loadFromLocalStorage, saveToLocalStorage, compressAndUploadImage]);
+
+  const switchEditMode = useCallback((mode: 'ir' | 'sv' | 'wysiwyg') => {
+    setEditMode(mode);
+    if (vditorInstance.current) {
+      vditorInstance.current.destroy();
+      vditorInstance.current = null;
+    }
+  }, []);
+
+
 
   const handleDragOver = useCallback((e: React.DragEvent) => {
     e.preventDefault();
@@ -179,7 +458,7 @@ export default function VditorEditor() {
     setShowDropzone(false);
   }, []);
 
-  const handleDrop = useCallback((e: React.DragEvent) => {
+  const handleDrop = useCallback(async (e: React.DragEvent) => {
     e.preventDefault();
     setShowDropzone(false);
     
@@ -187,14 +466,10 @@ export default function VditorEditor() {
     if (!file) return;
 
     if (file.type.startsWith('image/')) {
-      const reader = new FileReader();
-      reader.onload = (event) => {
-        const base64 = event.target?.result as string;
-        if (vditorInstance.current) {
-          vditorInstance.current.insertValue(`![${file.name}](${base64})`);
-        }
-      };
-      reader.readAsDataURL(file);
+      const url = await compressAndUploadImage(file);
+      if (vditorInstance.current) {
+        vditorInstance.current.insertValue(`![${file.name}](${url})`);
+      }
     } else if (file.name.endsWith('.md') || file.name.endsWith('.markdown') || file.name.endsWith('.txt')) {
       const reader = new FileReader();
       reader.onload = (event) => {
@@ -207,10 +482,52 @@ export default function VditorEditor() {
       };
       reader.readAsText(file);
     }
-  }, [saveToLocalStorage]);
+  }, [saveToLocalStorage, compressAndUploadImage]);
 
-  const handleExport = useCallback((format: 'html' | 'md' | 'text' | 'pdf') => {
+  const handleExport = useCallback(async (format: 'html' | 'md' | 'text' | 'pdf' | 'docx' | 'wechat') => {
     if (!vditorInstance.current) return;
+
+    if (format === 'docx') {
+      try {
+        const html = vditorInstance.current.getHTML();
+        const response = await fetch('/api/export/docx', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ html }),
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to generate DOCX');
+        }
+
+        const blob = await response.blob();
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'document.docx';
+        a.click();
+        URL.revokeObjectURL(url);
+      } catch (error) {
+        console.error('DOCX export error:', error);
+        alert('Failed to export DOCX');
+      }
+      return;
+    }
+
+    if (format === 'wechat') {
+      const html = vditorInstance.current.getHTML();
+      const wechatHtml = getWeChatStyleHTML(html);
+      const blob = new Blob([wechatHtml], { type: 'text/html' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'wechat-style.html';
+      a.click();
+      URL.revokeObjectURL(url);
+      return;
+    }
 
     if (format === 'pdf') {
       const printWindow = window.open('', '_blank');
@@ -221,10 +538,13 @@ export default function VditorEditor() {
           <head>
             <title>Export PDF</title>
             <style>
-              body { font-family: Arial, sans-serif; padding: 20px; }
+              body { font-family: Arial, sans-serif; padding: 20px; line-height: 1.6; }
               pre { background: #f5f5f5; padding: 10px; border-radius: 4px; overflow-x: auto; }
               code { background: #f5f5f5; padding: 2px 4px; border-radius: 2px; }
               blockquote { border-left: 4px solid #ddd; padding-left: 16px; margin-left: 0; color: #666; }
+              table { border-collapse: collapse; width: 100%; margin: 1em 0; }
+              th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+              th { background: #f5f5f5; }
             </style>
           </head>
           <body>
@@ -269,9 +589,55 @@ export default function VditorEditor() {
     URL.revokeObjectURL(url);
   }, []);
 
+  const handleClear = useCallback(() => {
+    if (!vditorInstance.current) return;
+    
+    if (confirm(t('editor.clearConfirm'))) {
+      vditorInstance.current.setValue('');
+      setContent('');
+      localStorage.removeItem(STORAGE_KEY);
+    }
+  }, [t]);
+
+  const handleSaveToLocal = useCallback(() => {
+    if (!vditorInstance.current) return;
+    
+    const content = vditorInstance.current.getValue();
+    const blob = new Blob([content], { type: 'text/markdown' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19);
+    a.download = `document-${timestamp}.md`;
+    a.click();
+    URL.revokeObjectURL(url);
+  }, []);
+
   const toggleOutline = useCallback(() => {
     setShowOutline(prev => !prev);
   }, []);
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.ctrlKey || e.metaKey) {
+        switch (e.key.toLowerCase()) {
+          case 's':
+            e.preventDefault();
+            handleSaveToLocal();
+            break;
+          case 'e':
+            e.preventDefault();
+            if (vditorInstance.current) {
+              handleExport('docx');
+            }
+            break;
+        }
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [handleSaveToLocal, handleExport]);
 
   if (!mounted) {
     return (
@@ -288,12 +654,41 @@ export default function VditorEditor() {
       onDragOver={handleDragOver}
       onDragLeave={handleDragLeave}
     >
+      {uploading && (
+        <div className="absolute top-0 left-0 right-0 z-20 bg-blue-500 text-white py-2 px-4 text-center text-sm">
+          <div className="flex items-center justify-center gap-2">
+            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+            <span>{t('editor.uploading')} {Math.round(uploadProgress)}%</span>
+          </div>
+          <div className="mt-1 h-1 bg-blue-300 rounded-full overflow-hidden">
+            <div 
+              className="h-full bg-white transition-all duration-300"
+              style={{ width: `${uploadProgress}%` }}
+            />
+          </div>
+        </div>
+      )}
+      
       {showDropzone && (
-        <div className="absolute inset-0 z-10 flex items-center justify-center bg-blue-500/10 border-2 border-dashed border-blue-500">
-          <div className="text-center">
-            <div className="text-4xl mb-2">📄</div>
-            <div className="text-lg font-medium text-blue-600">
+        <div className="absolute inset-0 z-10 flex items-center justify-center bg-gradient-to-br from-blue-500/10 to-purple-500/10 backdrop-blur-sm border-2 border-dashed border-blue-500 transition-all duration-300">
+          <div className="text-center p-10 bg-white/95 dark:bg-zinc-800/95 rounded-2xl shadow-2xl border-2 border-blue-500 transform transition-all duration-300 hover:scale-105">
+            <div className="flex justify-center gap-4 mb-6">
+              <div className="text-6xl animate-bounce">📄</div>
+              <div className="text-6xl animate-bounce" style={{ animationDelay: '0.2s' }}>🖼️</div>
+              <div className="text-6xl animate-bounce" style={{ animationDelay: '0.4s' }}>📝</div>
+            </div>
+            <div className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600 dark:from-blue-400 dark:to-purple-400 mb-3">
               {t('editor.dropzone')}
+            </div>
+            <div className="text-sm text-zinc-600 dark:text-zinc-300 mb-4">
+              {t('editor.dropzoneHint')}
+            </div>
+            <div className="flex flex-wrap justify-center gap-2">
+              <span className="px-3 py-1 bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-300 rounded-full text-xs">.md</span>
+              <span className="px-3 py-1 bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-300 rounded-full text-xs">.txt</span>
+              <span className="px-3 py-1 bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-300 rounded-full text-xs">.png</span>
+              <span className="px-3 py-1 bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-300 rounded-full text-xs">.jpg</span>
+              <span className="px-3 py-1 bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-300 rounded-full text-xs">.gif</span>
             </div>
           </div>
         </div>
@@ -304,8 +699,12 @@ export default function VditorEditor() {
         onShare={() => setShowShare(true)}
         onMindmap={() => setShowMindmap(true)}
         onToggleOutline={toggleOutline}
+        onClear={handleClear}
+        onSaveLocal={handleSaveToLocal}
         showOutline={showOutline}
         vditor={vditorInstance.current}
+        editMode={editMode}
+        onSwitchMode={switchEditMode}
       />
       <div ref={vditorRef} className="h-[calc(100%-48px)]" />
       
@@ -321,6 +720,10 @@ export default function VditorEditor() {
           content={content}
           onClose={() => setShowShare(false)}
         />
+      )}
+
+      {showGuide && (
+        <GuideModal onClose={handleCloseGuide} />
       )}
     </div>
   );

@@ -16,7 +16,12 @@
     "outline": "Outline",
     "themes": "Themes",
     "codeTheme": "Code Theme",
-    "contentTheme": "Content Theme"
+    "contentTheme": "Content Theme",
+    "clear": "Clear",
+    "clearConfirm": "Are you sure you want to clear all content? This action cannot be undone.",
+    "saveLocal": "Save to Local",
+    "uploading": "Uploading...",
+    "dropzoneHint": "Drop files here to start editing"
   },
   "toolbar": {
     "bold": "Bold",
@@ -30,7 +35,17 @@
     "image": "Image",
     "table": "Table",
     "undo": "Undo",
-    "redo": "Redo"
+    "redo": "Redo",
+    "mode": "Edit Mode",
+    "modeIR": "Instant Rendering",
+    "modeSV": "Split View",
+    "modeWYSIWYG": "WYSIWYG",
+    "exportDocx": "DOCX Document",
+    "exportPdf": "PDF Document",
+    "exportHtml": "HTML Page",
+    "exportMd": "Markdown File",
+    "exportText": "Plain Text",
+    "exportWechat": "WeChat Style"
   },
   "share": {
     "title": "Share Document",
@@ -41,6 +56,7 @@
     "sevenDays": "7 Days",
     "thirtyDays": "30 Days",
     "never": "Never",
+    "generateLink": "Generate Link",
     "copyLink": "Copy Link",
     "copied": "Copied!",
     "generating": "Generating...",
@@ -53,7 +69,10 @@
     "export": "Export SVG",
     "close": "Close",
     "noContent": "No content to generate mindmap",
-    "noHeadings": "No valid headings found in the document"
+    "noHeadings": "No valid headings found in the document",
+    "hint": "Click to expand/collapse | Scroll to zoom | Drag to move",
+    "loading": "Loading...",
+    "tip": "Tip: Add headings (# ## ###) to your document to generate a mindmap"
   },
   "language": {
     "switch": "Switch Language",
@@ -72,5 +91,20 @@
     "cancel": "Cancel",
     "confirm": "Confirm",
     "save": "Save"
+  },
+  "guide": {
+    "welcome": "Welcome to Cafe MD",
+    "subtitle": "A simple but powerful Markdown online editor",
+    "skip": "Skip",
+    "next": "Next",
+    "start": "Get Started",
+    "editorTitle": "Powerful Editor",
+    "editorDesc": "Supports three editing modes: instant rendering, split view, and WYSIWYG to suit different preferences",
+    "mindmapTitle": "Mind Map",
+    "mindmapDesc": "Generate mind maps with one click to organize ideas and display document structure",
+    "exportTitle": "Multi-format Export",
+    "exportDesc": "Export to HTML, Markdown, PDF, DOCX and other formats",
+    "shareTitle": "Cloud Sharing",
+    "shareDesc": "Generate share links to easily share your documents with others"
   }
 }

@@ -134,7 +134,7 @@ export default function MindmapModal({ content, onClose }: MindmapModalProps) {
               {t('title')}
             </h2>
             <p className="text-sm text-zinc-500 dark:text-zinc-400 mt-1">
-              点击节点可展开/折叠 | 滚轮缩放 | 拖拽移动
+              {t('hint')}
             </p>
           </div>
           <div className="flex items-center gap-2">
@@ -157,9 +157,9 @@ export default function MindmapModal({ content, onClose }: MindmapModalProps) {
           {isLoading && (
             <div className="absolute inset-0 flex items-center justify-center bg-white dark:bg-zinc-900 z-10">
               <div className="text-center">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto mb-2"></div>
-                <div className="text-zinc-500">Loading...</div>
-              </div>
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto mb-2"></div>
+                  <div className="text-zinc-500">{t('loading')}</div>
+                </div>
             </div>
           )}
           {error ? (
@@ -167,9 +167,9 @@ export default function MindmapModal({ content, onClose }: MindmapModalProps) {
               <div className="text-center">
                 <div className="text-red-500 mb-2 text-4xl">⚠️</div>
                 <p className="text-zinc-600 dark:text-zinc-400">{error}</p>
-                <p className="text-sm text-zinc-500 dark:text-zinc-500 mt-2">
-                  Tip: Add headings (# ## ###) to your document to generate a mindmap
-                </p>
+                <p className="text-sm text-zinc-500 dark:text-zinc-400 mt-1">
+          {t('tip')}
+        </p>
               </div>
             </div>
           ) : (

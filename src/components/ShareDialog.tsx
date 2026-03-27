@@ -134,7 +134,7 @@ export default function ShareDialog({ content, onClose }: ShareDialogProps) {
             disabled={loading}
             className="px-4 py-2 text-sm bg-blue-500 hover:bg-blue-600 disabled:bg-blue-300 text-white rounded"
           >
-            {loading ? t('generating') : t('copyLink')}
+            {loading ? t('generating') : t('generateLink')}
           </button>
         </div>
       </div>

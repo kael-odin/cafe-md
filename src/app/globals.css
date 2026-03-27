@@ -251,6 +251,13 @@ body {
   margin: 1em 0 !important;
   overflow: hidden !important;
   border-radius: 8px !important;
+  background: #ffffff !important;
+  border: 1px solid #e5e7eb !important;
+}
+
+.dark .vditor-reset table {
+  background: #18181b !important;
+  border-color: #3f3f46 !important;
 }
 
 .vditor-reset table thead {
@@ -442,7 +449,7 @@ body {
 }
 
 .vditor-outline__item {
-  color: #374151 !important;
+  color: #1f2937 !important;
   padding: 4px 8px !important;
   border-left: 2px solid transparent !important;
   transition: all 0.2s !important;
@@ -451,15 +458,17 @@ body {
 .vditor-outline__item:hover {
   background: #f3f4f6 !important;
   border-left-color: #3b82f6 !important;
+  color: #111827 !important;
 }
 
 .dark .vditor-outline__item {
-  color: #d4d4d8 !important;
+  color: #fafafa !important;
 }
 
 .dark .vditor-outline__item:hover {
   background: #27272a !important;
   border-left-color: #60a5fa !important;
+  color: #ffffff !important;
 }
 
 .vditor-outline__item--current {

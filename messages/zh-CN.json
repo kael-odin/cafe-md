@@ -16,7 +16,12 @@
     "outline": "目录",
     "themes": "主题",
     "codeTheme": "代码主题",
-    "contentTheme": "内容主题"
+    "contentTheme": "内容主题",
+    "clear": "清屏",
+    "clearConfirm": "确定要清空所有内容吗？此操作不可撤销。",
+    "saveLocal": "保存到本地",
+    "uploading": "上传中...",
+    "dropzoneHint": "拖放文件到这里开始编辑"
   },
   "toolbar": {
     "bold": "粗体",
@@ -30,7 +35,17 @@
     "image": "图片",
     "table": "表格",
     "undo": "撤销",
-    "redo": "重做"
+    "redo": "重做",
+    "mode": "编辑模式",
+    "modeIR": "即时渲染",
+    "modeSV": "分屏预览",
+    "modeWYSIWYG": "所见即所得",
+    "exportDocx": "DOCX 文档",
+    "exportPdf": "PDF 文档",
+    "exportHtml": "HTML 页面",
+    "exportMd": "Markdown 文件",
+    "exportText": "纯文本",
+    "exportWechat": "微信样式"
   },
   "share": {
     "title": "分享文档",
@@ -41,6 +56,7 @@
     "sevenDays": "7天",
     "thirtyDays": "30天",
     "never": "永不过期",
+    "generateLink": "生成链接",
     "copyLink": "复制链接",
     "copied": "已复制！",
     "generating": "生成中...",
@@ -53,7 +69,10 @@
     "export": "导出 SVG",
     "close": "关闭",
     "noContent": "无内容可生成思维导图",
-    "noHeadings": "文档中没有有效的标题"
+    "noHeadings": "文档中没有有效的标题",
+    "hint": "点击展开/折叠 | 滚动缩放 | 拖拽移动",
+    "loading": "加载中...",
+    "tip": "提示：添加标题（# ## ###）到文档中可生成思维导图"
   },
   "language": {
     "switch": "切换语言",
@@ -72,5 +91,20 @@
     "cancel": "取消",
     "confirm": "确认",
     "save": "保存"
+  },
+  "guide": {
+    "welcome": "欢迎使用 Cafe MD",
+    "subtitle": "一个极简但强大的 Markdown 在线编辑器",
+    "skip": "跳过",
+    "next": "下一步",
+    "start": "开始使用",
+    "editorTitle": "强大的编辑器",
+    "editorDesc": "支持三种编辑模式：即时渲染、分屏预览、所见即所得，满足不同使用习惯",
+    "mindmapTitle": "思维导图",
+    "mindmapDesc": "一键生成思维导图，帮助整理思路和展示文档结构",
+    "exportTitle": "多格式导出",
+    "exportDesc": "支持导出为 HTML、Markdown、PDF、DOCX 等多种格式",
+    "shareTitle": "云端分享",
+    "shareDesc": "生成分享链接，轻松分享你的文档给他人"
   }
 }

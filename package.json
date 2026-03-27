@@ -10,7 +10,10 @@
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.100.1",
+    "browser-image-compression": "^2.0.2",
     "clsx": "^2.1.1",
+    "docx": "^9.6.1",
+    "html-to-docx": "^1.8.0",
     "markmap-lib": "^0.18.12",
     "markmap-view": "^0.18.12",
     "nanoid": "^5.1.7",
