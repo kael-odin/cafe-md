@@ -12,7 +12,11 @@
     "mindmap": "Mind Map",
     "preview": "Preview",
     "source": "Source",
-    "split": "Split"
+    "split": "Split",
+    "outline": "Outline",
+    "themes": "Themes",
+    "codeTheme": "Code Theme",
+    "contentTheme": "Content Theme"
   },
   "toolbar": {
     "bold": "Bold",
@@ -41,12 +45,15 @@
     "copied": "Copied!",
     "generating": "Generating...",
     "success": "Share link generated",
-    "error": "Failed, please retry"
+    "error": "Failed, please retry",
+    "close": "Close"
   },
   "mindmap": {
     "title": "Mind Map",
     "export": "Export SVG",
-    "close": "Close"
+    "close": "Close",
+    "noContent": "No content to generate mindmap",
+    "noHeadings": "No valid headings found in the document"
   },
   "language": {
     "switch": "Switch Language",

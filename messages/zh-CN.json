@@ -12,7 +12,11 @@
     "mindmap": "思维导图",
     "preview": "预览",
     "source": "源码",
-    "split": "分栏"
+    "split": "分栏",
+    "outline": "目录",
+    "themes": "主题",
+    "codeTheme": "代码主题",
+    "contentTheme": "内容主题"
   },
   "toolbar": {
     "bold": "粗体",
@@ -41,12 +45,15 @@
     "copied": "已复制！",
     "generating": "生成中...",
     "success": "分享链接已生成",
-    "error": "生成失败，请重试"
+    "error": "生成失败，请重试",
+    "close": "关闭"
   },
   "mindmap": {
     "title": "思维导图",
     "export": "导出 SVG",
-    "close": "关闭"
+    "close": "关闭",
+    "noContent": "无内容可生成思维导图",
+    "noHeadings": "文档中没有有效的标题"
   },
   "language": {
     "switch": "切换语言",
