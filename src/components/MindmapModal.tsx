@@ -13,57 +13,80 @@ interface MindmapModalProps {
 export default function MindmapModal({ content, onClose }: MindmapModalProps) {
   const t = useTranslations('mindmap');
   const svgRef = useRef<SVGSVGElement>(null);
-  const [markmapInstance, setMarkmapInstance] = useState<Markmap | null>(null);
+  const markmapRef = useRef<Markmap | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     if (!svgRef.current || !content.trim()) {
-      setError('No content to generate mindmap');
+      setError(t('noContent'));
+      setIsLoading(false);
       return;
     }
 
-    try {
-      setError(null);
-      const transformer = new Transformer();
-      const { root } = transformer.transform(content);
+    const timer = setTimeout(() => {
+      try {
+        setIsLoading(true);
+        setError(null);
 
-      if (!root || !root.children || root.children.length === 0) {
-        setError('No valid headings found in the document');
-        return;
-      }
+        const transformer = new Transformer();
+        const { root } = transformer.transform(content);
 
-      if (!markmapInstance) {
-        const mm = Markmap.create(svgRef.current, {
-          autoFit: true,
-          color: (node) => {
-            const colors = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899'];
-            return colors[node.state?.depth % colors.length] || colors[0];
-          },
-          duration: 500,
-          maxWidth: 300,
-        }, root);
-        setMarkmapInstance(mm);
-      } else {
-        markmapInstance.setData(root);
-        markmapInstance.fit();
+        if (!root || !root.children || root.children.length === 0) {
+          setError(t('noHeadings'));
+          setIsLoading(false);
+          return;
+        }
+
+        if (markmapRef.current) {
+          markmapRef.current.setData(root);
+          markmapRef.current.fit();
+        } else {
+          const mm = Markmap.create(svgRef.current!, {
+            autoFit: true,
+            color: (node) => {
+              const colors = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899'];
+              return colors[node.state?.depth % colors.length] || colors[0];
+            },
+            duration: 500,
+            maxWidth: 300,
+          }, root);
+          
+          markmapRef.current = mm;
+          
+          setTimeout(() => {
+            mm.fit();
+          }, 100);
+        }
+
+        setIsLoading(false);
+      } catch (e) {
+        console.error('Mindmap generation error:', e);
+        setError('Failed to generate mindmap');
+        setIsLoading(false);
       }
-    } catch (e) {
-      console.error('Mindmap generation error:', e);
-      setError('Failed to generate mindmap. Please check your markdown content.');
-    }
-  }, [content, markmapInstance]);
+    }, 100);
+
+    return () => {
+      clearTimeout(timer);
+    };
+  }, [content, t]);
 
   const handleExportSVG = () => {
     if (!svgRef.current) return;
 
-    const svgData = new XMLSerializer().serializeToString(svgRef.current);
-    const blob = new Blob([svgData], { type: 'image/svg+xml' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'mindmap.svg';
-    a.click();
-    URL.revokeObjectURL(url);
+    try {
+      const svgData = new XMLSerializer().serializeToString(svgRef.current);
+      const blob = new Blob([svgData], { type: 'image/svg+xml' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'mindmap.svg';
+      a.click();
+      URL.revokeObjectURL(url);
+    } catch (e) {
+      console.error('Export error:', e);
+    }
   };
 
   return (
@@ -76,7 +99,7 @@ export default function MindmapModal({ content, onClose }: MindmapModalProps) {
           <div className="flex items-center gap-2">
             <button
               onClick={handleExportSVG}
-              disabled={!!error}
+              disabled={!!error || isLoading}
               className="px-4 py-2 text-sm bg-blue-500 hover:bg-blue-600 disabled:bg-zinc-300 disabled:cursor-not-allowed text-white rounded"
             >
               {t('export')}
@@ -89,7 +112,12 @@ export default function MindmapModal({ content, onClose }: MindmapModalProps) {
             </button>
           </div>
         </div>
-        <div className="flex-1 overflow-hidden p-6">
+        <div className="flex-1 overflow-hidden p-6 relative">
+          {isLoading && (
+            <div className="absolute inset-0 flex items-center justify-center bg-white dark:bg-zinc-900 z-10">
+              <div className="text-zinc-500">Loading...</div>
+            </div>
+          )}
           {error ? (
             <div className="flex items-center justify-center h-full">
               <div className="text-center">
@@ -101,7 +129,11 @@ export default function MindmapModal({ content, onClose }: MindmapModalProps) {
               </div>
             </div>
           ) : (
-            <svg ref={svgRef} className="w-full h-full" />
+            <svg 
+              ref={svgRef} 
+              className="w-full h-full"
+              style={{ minWidth: '100%', minHeight: '100%' }}
+            />
           )}
         </div>
       </div>

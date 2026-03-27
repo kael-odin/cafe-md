@@ -18,6 +18,8 @@ export default function VditorEditor() {
   const [showMindmap, setShowMindmap] = useState(false);
   const [showShare, setShowShare] = useState(false);
   const [mounted, setMounted] = useState(false);
+  const [showDropzone, setShowDropzone] = useState(false);
+  const [showOutline, setShowOutline] = useState(false);
 
   const saveToLocalStorage = useCallback((value: string) => {
     try {
@@ -114,6 +116,10 @@ export default function VditorEditor() {
         },
       },
       toolbar: false,
+      outline: {
+        enable: showOutline,
+        position: 'left',
+      },
       preview: {
         markdown: {
           toc: true,
@@ -161,10 +167,22 @@ export default function VditorEditor() {
         vditorInstance.current = null;
       }
     };
-  }, [mounted, t, loadFromLocalStorage, saveToLocalStorage]);
+  }, [mounted, showOutline, t, loadFromLocalStorage, saveToLocalStorage]);
+
+  const handleDragOver = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
+    setShowDropzone(true);
+  }, []);
+
+  const handleDragLeave = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
+    setShowDropzone(false);
+  }, []);
 
   const handleDrop = useCallback((e: React.DragEvent) => {
     e.preventDefault();
+    setShowDropzone(false);
+    
     const file = e.dataTransfer.files[0];
     if (!file) return;
 
@@ -191,8 +209,34 @@ export default function VditorEditor() {
     }
   }, [saveToLocalStorage]);
 
-  const handleExport = useCallback((format: 'html' | 'md' | 'text') => {
+  const handleExport = useCallback((format: 'html' | 'md' | 'text' | 'pdf') => {
     if (!vditorInstance.current) return;
+
+    if (format === 'pdf') {
+      const printWindow = window.open('', '_blank');
+      if (printWindow) {
+        printWindow.document.write(`
+          <!DOCTYPE html>
+          <html>
+          <head>
+            <title>Export PDF</title>
+            <style>
+              body { font-family: Arial, sans-serif; padding: 20px; }
+              pre { background: #f5f5f5; padding: 10px; border-radius: 4px; overflow-x: auto; }
+              code { background: #f5f5f5; padding: 2px 4px; border-radius: 2px; }
+              blockquote { border-left: 4px solid #ddd; padding-left: 16px; margin-left: 0; color: #666; }
+            </style>
+          </head>
+          <body>
+            ${vditorInstance.current.getHTML()}
+          </body>
+          </html>
+        `);
+        printWindow.document.close();
+        printWindow.print();
+      }
+      return;
+    }
 
     let content = '';
     let filename = '';
@@ -225,6 +269,10 @@ export default function VditorEditor() {
     URL.revokeObjectURL(url);
   }, []);
 
+  const toggleOutline = useCallback(() => {
+    setShowOutline(prev => !prev);
+  }, []);
+
   if (!mounted) {
     return (
       <div className="flex items-center justify-center h-full">
@@ -235,14 +283,28 @@ export default function VditorEditor() {
 
   return (
     <div
-      className="h-full w-full"
+      className="h-full w-full relative"
       onDrop={handleDrop}
-      onDragOver={(e) => e.preventDefault()}
+      onDragOver={handleDragOver}
+      onDragLeave={handleDragLeave}
     >
+      {showDropzone && (
+        <div className="absolute inset-0 z-10 flex items-center justify-center bg-blue-500/10 border-2 border-dashed border-blue-500">
+          <div className="text-center">
+            <div className="text-4xl mb-2">📄</div>
+            <div className="text-lg font-medium text-blue-600">
+              {t('editor.dropzone')}
+            </div>
+          </div>
+        </div>
+      )}
+      
       <Toolbar
         onExport={handleExport}
         onShare={() => setShowShare(true)}
         onMindmap={() => setShowMindmap(true)}
+        onToggleOutline={toggleOutline}
+        showOutline={showOutline}
         vditor={vditorInstance.current}
       />
       <div ref={vditorRef} className="h-[calc(100%-48px)]" />
