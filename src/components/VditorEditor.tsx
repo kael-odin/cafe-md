@@ -61,6 +61,32 @@ export default function VditorEditor() {
       upload: {
         url: '/api/upload',
         fieldName: 'file[]',
+        accept: 'image/*,.md,.txt',
+        handler: (files) => {
+          const file = files[0];
+          if (file.type.startsWith('image/')) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+              const base64 = e.target?.result as string;
+              if (vditorInstance.current) {
+                vditorInstance.current.insertValue(`![${file.name}](${base64})`);
+              }
+            };
+            reader.readAsDataURL(file);
+          } else if (file.name.endsWith('.md') || file.name.endsWith('.txt')) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+              const text = e.target?.result as string;
+              if (vditorInstance.current) {
+                vditorInstance.current.setValue(text);
+                setContent(text);
+                saveToLocalStorage(text);
+              }
+            };
+            reader.readAsText(file);
+          }
+          return null;
+        },
         format: (files, responseText) => {
           try {
             const response = JSON.parse(responseText);
@@ -94,10 +120,16 @@ export default function VditorEditor() {
           mark: true,
           footnotes: true,
           autoSpace: true,
+          gfmAutoLink: true,
         },
         math: {
           inlineDigit: true,
           engine: 'KaTeX',
+        },
+        hljs: {
+          enable: true,
+          lineNumber: true,
+          style: 'github',
         },
       },
       hint: {
@@ -134,7 +166,18 @@ export default function VditorEditor() {
   const handleDrop = useCallback((e: React.DragEvent) => {
     e.preventDefault();
     const file = e.dataTransfer.files[0];
-    if (file && (file.name.endsWith('.md') || file.name.endsWith('.markdown') || file.name.endsWith('.txt'))) {
+    if (!file) return;
+
+    if (file.type.startsWith('image/')) {
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        const base64 = event.target?.result as string;
+        if (vditorInstance.current) {
+          vditorInstance.current.insertValue(`![${file.name}](${base64})`);
+        }
+      };
+      reader.readAsDataURL(file);
+    } else if (file.name.endsWith('.md') || file.name.endsWith('.markdown') || file.name.endsWith('.txt')) {
       const reader = new FileReader();
       reader.onload = (event) => {
         const text = event.target?.result as string;
