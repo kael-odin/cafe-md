@@ -3,7 +3,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { Transformer } from 'markmap-lib';
 import { Markmap } from 'markmap-view';
-import 'markmap-view/dist/style.css';
 import { useTranslations } from 'next-intl';
 
 interface MindmapModalProps {
@@ -176,7 +175,7 @@ export default function MindmapModal({ content, onClose }: MindmapModalProps) {
           ) : (
             <svg 
               ref={svgRef} 
-              className="w-full h-full"
+              className="w-full h-full mindmap-svg"
               style={{ 
                 minWidth: '100%', 
                 minHeight: '100%',

@@ -388,3 +388,88 @@ body {
 .dark .vditor-preview::-webkit-scrollbar-thumb:hover {
   background: #6b7280 !important;
 }
+
+/* Markmap 思维导图样式 */
+.mindmap-svg {
+  width: 100%;
+  height: 100%;
+}
+
+.mindmap-svg .markmap-node-circle {
+  cursor: pointer;
+  fill: #f3f4f6;
+  stroke: #d1d5db;
+  stroke-width: 2;
+}
+
+.dark .mindmap-svg .markmap-node-circle {
+  fill: #27272a;
+  stroke: #4b5563;
+}
+
+.mindmap-svg .markmap-node-text {
+  fill: #1f2937;
+  font-size: 14px;
+  font-family: var(--font-sans), system-ui, sans-serif;
+}
+
+.dark .mindmap-svg .markmap-node-text {
+  fill: #e5e7eb;
+}
+
+.mindmap-svg .markmap-link {
+  fill: none;
+  stroke-width: 2px;
+}
+
+.mindmap-svg .markmap-foreign {
+  display: inline-block;
+}
+
+.mindmap-svg foreignObject {
+  overflow: visible;
+}
+
+/* Vditor 目录导航样式 */
+.vditor-outline {
+  background: #ffffff !important;
+  border-right: 1px solid #e5e7eb !important;
+}
+
+.dark .vditor-outline {
+  background: #18181b !important;
+  border-right: 1px solid #3f3f46 !important;
+}
+
+.vditor-outline__item {
+  color: #374151 !important;
+  padding: 4px 8px !important;
+  border-left: 2px solid transparent !important;
+  transition: all 0.2s !important;
+}
+
+.vditor-outline__item:hover {
+  background: #f3f4f6 !important;
+  border-left-color: #3b82f6 !important;
+}
+
+.dark .vditor-outline__item {
+  color: #d4d4d8 !important;
+}
+
+.dark .vditor-outline__item:hover {
+  background: #27272a !important;
+  border-left-color: #60a5fa !important;
+}
+
+.vditor-outline__item--current {
+  color: #3b82f6 !important;
+  background: #eff6ff !important;
+  border-left-color: #3b82f6 !important;
+}
+
+.dark .vditor-outline__item--current {
+  color: #60a5fa !important;
+  background: #1e3a5f !important;
+  border-left-color: #60a5fa !important;
+}
