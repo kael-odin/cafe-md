@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
-  "name": "Cafe MD - Markdown Viewer",
-  "version": "1.0.0",
-  "description": "View and edit Markdown files in browser with Cafe MD",
+  "name": "Cafe MD - Markdown Viewer & Editor",
+  "version": "1.1.0",
+  "description": "View and edit Markdown files in browser. Drag .md files to open, or view local markdown files directly.",
   "icons": {
     "16": "icons/icon16.png",
     "48": "icons/icon48.png",
@@ -21,19 +21,27 @@
   },
   "content_scripts": [
     {
-      "matches": ["<all_urls>"],
+      "matches": ["<all_urls>", "file:///*"],
       "js": ["content.js"],
       "run_at": "document_start",
       "all_frames": true
+    },
+    {
+      "matches": ["file:///*"],
+      "include_globs": ["*.md", "*.markdown", "*.txt"],
+      "js": ["markdown-viewer.js"],
+      "run_at": "document_end"
     }
   ],
   "permissions": [
     "contextMenus",
     "activeTab",
-    "storage"
+    "storage",
+    "scripting"
   ],
   "host_permissions": [
     "<all_urls>",
     "file:///*"
-  ]
+  ],
+  "options_page": "options.html"
 }
