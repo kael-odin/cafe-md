@@ -46,7 +46,7 @@ body {
 .vditor-toolbar {
   position: sticky !important;
   top: 48px !important;
-  z-index: 10 !important;
+  z-index: 5 !important;
   border-bottom: 1px solid #e5e7eb !important;
   background: #ffffff !important;
   padding: 8px 12px !important;
@@ -103,27 +103,19 @@ body {
   margin-top: 8px !important;
 }
 
-.vditor-tip {
+.vditor-tooltipped::after,
+.vditor-tooltipped::before {
   z-index: 99999 !important;
-  position: fixed !important;
-  top: auto !important;
-  bottom: auto !important;
-  transform: none !important;
 }
 
-.vditor-tip--show {
-  display: block !important;
-}
-
-.vditor-toolbar__item:hover .vditor-tip {
+.vditor-tooltipped__s::after,
+.vditor-tooltipped__se::after,
+.vditor-tooltipped__sw::after {
   top: 100% !important;
   margin-top: 8px !important;
-  left: 50% !important;
-  transform: translateX(-50%) !important;
 }
 
-.vditor-toolbar__item[data-type="more"],
-.vditor-toolbar__item:last-child:has(.vditor-toolbar__sub) {
+.vditor-toolbar__item[data-type="more"] {
   display: none !important;
 }
 
