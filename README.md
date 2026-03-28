@@ -1,8 +1,16 @@
-# Cafe MD ☕
+<div align="center">
 
-**极简但强大的 Markdown 在线工具**
+# ☕ Cafe MD
+
+**极简但强大的 Markdown 在线编辑器**
+
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Next.js](https://img.shields.io/badge/Next.js-15.2-black?logo=next.js)](https://nextjs.org/)
+[![Cloudflare Workers](https://img.shields.io/badge/Cloudflare-Workers-orange?logo=cloudflare)](https://workers.cloudflare.com/)
 
 [English](#english) | [中文](#中文)
+
+</div>
 
 ---
 
@@ -10,37 +18,35 @@
 
 ### 🎯 项目简介
 
-Cafe MD 是一个基于 Next.js 15+ 构建的现代化 Markdown 在线编辑器，集成了强大的编辑、预览、分享和思维导图功能。
+**Cafe MD** 是一个免费、开源的 Markdown 在线编辑器，无需登录即可使用。支持实时预览、思维导图、多格式导出、云端分享等功能。文档内容仅保存在本地浏览器，保护你的隐私安全。
+
+🔗 **在线体验**: [https://cafe-md.t445481611.workers.dev](https://cafe-md.t445481611.workers.dev)
 
 ### ✨ 核心特性
 
-- 📝 **强大的编辑器**：基于 Vditor，支持三种编辑模式（所见即所得、即时渲染、分屏预览）
-- 🌍 **国际化支持**：原生支持中英文切换，编辑器界面完全国际化
-- 🎨 **主题切换**：支持亮色/暗色/跟随系统三种主题
-- 📤 **文件导入**：支持拖放本地 .md/.txt 文件，智能粘贴处理
-- 💾 **自动保存**：本地 localStorage 自动保存，防止内容丢失
-- 🔗 **分享功能**：生成公开/私密分享链接，支持过期时间设置
-- 🗺️ **思维导图**：一键生成 Markdown 思维导图并导出 SVG
-- 📊 **图表支持**：支持 Mermaid、数学公式、代码高亮等
-- 📤 **多格式导出**：支持 DOCX、PDF、HTML、Markdown、纯文本、微信样式导出
-- 🚀 **快速部署**：支持 Vercel 一键部署
+| 功能 | 描述 |
+|------|------|
+| 📝 **三种编辑模式** | 所见即所得、即时渲染、分屏预览 |
+| 🌍 **国际化支持** | 原生支持中英文切换 |
+| 🎨 **暗色模式** | 支持亮色/暗色/跟随系统 |
+| 🔒 **数据安全** | 文档仅保存在本地浏览器 |
+| 📤 **多格式导出** | HTML、Markdown、PDF、DOCX、微信样式 |
+| 🔗 **云端分享** | 生成公开/私密分享链接 |
+| 🗺️ **思维导图** | 一键生成并导出 SVG |
+| 🖼️ **图片上传** | 自动压缩并上传到云端 |
+| 🧩 **浏览器扩展** | 拖拽 .md 文件直接打开 |
 
-### 🛠️ 技术栈
+### 🚀 快速开始
 
-- **框架**: Next.js 15+ (App Router)
-- **语言**: TypeScript 5+
-- **样式**: Tailwind CSS 3+
-- **编辑器**: Vditor 3.10+
-- **思维导图**: markmap
-- **国际化**: next-intl
-- **存储**: Supabase (可选) / 内存存储
-- **部署**: Cloudflare Workers / Vercel
+#### 在线使用
 
-### 📦 安装
+直接访问 [cafe-md.t445481611.workers.dev](https://cafe-md.t445481611.workers.dev) 即可使用，无需安装。
+
+#### 本地开发
 
 ```bash
 # 克隆仓库
-git clone <your-repo-url>
+git clone https://github.com/kael-odin/cafe-md.git
 cd cafe-md
 
 # 安装依赖
@@ -52,95 +58,67 @@ npm run dev
 
 访问 http://localhost:3000
 
-### 🚀 快速开始
+### 📦 浏览器扩展
 
-1. **编辑 Markdown**: 在编辑器中直接编写或粘贴内容
-2. **导入文件**: 拖放本地 .md 文件到编辑器
-3. **切换主题**: 点击右上角主题选择器
-4. **切换语言**: 点击右上角语言选择器
-5. **生成思维导图**: 点击工具栏"思维导图"按钮
-6. **分享文档**: 点击"分享"按钮生成分享链接
+支持拖拽 .md 文件到浏览器直接打开编辑。
+
+**安装方法**：
+1. 下载 `extension` 文件夹
+2. 打开 `chrome://extensions/`
+3. 开启「开发者模式」
+4. 点击「加载已解压的扩展程序」
+5. 选择 `extension` 文件夹
+
+详见 [extension/README.md](extension/README.md)
+
+### 🛠️ 技术栈
+
+- **框架**: Next.js 15.2 (App Router)
+- **语言**: TypeScript 5
+- **样式**: Tailwind CSS 4
+- **编辑器**: Vditor 3.11
+- **思维导图**: markmap
+- **国际化**: next-intl
+- **存储**: Supabase
+- **部署**: Cloudflare Workers
 
 ### 📁 项目结构
 
 ```
 cafe-md/
 ├── src/
-│   ├── app/
-│   │   ├── [locale]/          # 国际化路由
-│   │   │   ├── layout.tsx     # 根布局
-│   │   │   └── page.tsx       # 首页
-│   │   ├── api/               # API 路由
-│   │   │   ├── share/         # 分享 API
-│   │   │   └── upload/        # 上传 API
-│   │   └── s/[slug]/          # 分享页面
-│   ├── components/            # React 组件
-│   │   ├── VditorEditor.tsx   # 编辑器组件
-│   │   ├── Toolbar.tsx        # 工具栏
-│   │   ├── MindmapModal.tsx   # 思维导图弹窗
-│   │   ├── ShareDialog.tsx    # 分享对话框
-│   │   ├── LanguageSwitcher.tsx
-│   │   └── ThemeSwitcher.tsx
-│   ├── i18n/                  # 国际化配置
-│   └── middleware.ts          # 中间件
-├── messages/                  # 语言文件
-│   ├── zh-CN.json
-│   └── en-US.json
-└── public/                    # 静态资源
+│   ├── app/              # Next.js App Router
+│   ├── components/       # React 组件
+│   ├── lib/              # 工具库
+│   └── i18n/             # 国际化配置
+├── extension/            # 浏览器扩展
+├── messages/             # 语言文件
+├── supabase/             # 数据库脚本
+└── public/               # 静态资源
 ```
 
-### 🎨 功能演示
-
-#### 编辑器模式
-- **所见即所得 (WYSIWYG)**: 类似 Word 的富文本编辑体验
-- **即时渲染 (IR)**: 类似 Typora 的实时渲染模式
-- **分屏预览 (SV)**: 左侧编辑，右侧预览
-
-#### 工具栏功能
-- 标题、粗体、斜体、删除线
-- 引用、列表、代码、链接、表格
-- 撤销、重做
-- 导出（HTML/Markdown/Text）
-- 思维导图
-- 分享
-
-### 🔧 配置
-
-#### 环境变量（可选）
+### 🔧 环境变量（可选）
 
 创建 `.env.local` 文件：
 
 ```env
-# Supabase 配置（用于持久化存储）
 NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
 NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
 ```
 
 ### 📝 开发计划
 
-#### V1.0 (当前版本) ✅
 - [x] Vditor 编辑器集成
 - [x] 中英文国际化
-- [x] 主题切换
-- [x] 本地文件拖放
-- [x] localStorage 自动保存
-- [x] 分享功能（内存存储）
-- [x] 思维导图生成
-- [x] 导出功能
-
-#### V2.0 (计划中)
-- [ ] Supabase 持久化存储
-- [ ] 用户系统
-- [ ] 我的文档管理
-- [ ] 文档历史版本
-- [ ] 图片上传到云存储
-- [ ] AI 功能集成
-
-#### V3.0 (未来)
-- [ ] 团队协作
-- [ ] 实时协作编辑
-- [ ] 私有化部署
-- [ ] 商业化功能
+- [x] 暗色模式
+- [x] 云端分享（公开/私密）
+- [x] 图片上传
+- [x] 思维导图
+- [x] 多格式导出
+- [x] 浏览器扩展
+- [ ] 用户系统（可选）
+- [ ] 文档管理
+- [ ] AI 辅助写作
 
 ### 🤝 贡献
 
@@ -148,7 +126,7 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
 
 ### 📄 许可证
 
-MIT License
+[MIT License](LICENSE)
 
 ---
 
@@ -156,37 +134,35 @@ MIT License
 
 ### 🎯 Introduction
 
-Cafe MD is a modern Markdown online editor built with Next.js 15+, featuring powerful editing, preview, sharing, and mind map capabilities.
+**Cafe MD** is a free, open-source Markdown online editor. No login required. Features real-time preview, mind maps, multi-format export, and cloud sharing. Your documents are stored locally in your browser for privacy protection.
+
+🔗 **Live Demo**: [https://cafe-md.t445481611.workers.dev](https://cafe-md.t445481611.workers.dev)
 
 ### ✨ Key Features
 
-- 📝 **Powerful Editor**: Based on Vditor, supports three editing modes (WYSIWYG, Instant Rendering, Split View)
-- 🌍 **Internationalization**: Native support for Chinese and English, fully localized editor interface
-- 🎨 **Theme Switching**: Light/Dark/System themes
-- 📤 **File Import**: Drag and drop local .md/.txt files, smart paste handling
-- 💾 **Auto Save**: Local localStorage auto-save
-- 🔗 **Sharing**: Generate public/private share links with expiration
-- 🗺️ **Mind Map**: One-click Markdown mind map generation with SVG export
-- 📊 **Chart Support**: Mermaid, math formulas, code highlighting
-- 📤 **Multi-format Export**: DOCX, PDF, HTML, Markdown, plain text, WeChat style export
-- 🚀 **Fast Deployment**: One-click Vercel deployment
+| Feature | Description |
+|---------|-------------|
+| 📝 **Three Editing Modes** | WYSIWYG, Instant Rendering, Split View |
+| 🌍 **i18n Support** | Native Chinese and English |
+| 🎨 **Dark Mode** | Light/Dark/System themes |
+| 🔒 **Data Security** | Documents stored locally only |
+| 📤 **Multi-format Export** | HTML, Markdown, PDF, DOCX, WeChat style |
+| 🔗 **Cloud Sharing** | Generate public/private share links |
+| 🗺️ **Mind Map** | One-click generation with SVG export |
+| 🖼️ **Image Upload** | Auto-compress and upload to cloud |
+| 🧩 **Browser Extension** | Drag .md files to open directly |
 
-### 🛠️ Tech Stack
+### 🚀 Quick Start
 
-- **Framework**: Next.js 15+ (App Router)
-- **Language**: TypeScript 5+
-- **Styling**: Tailwind CSS 3+
-- **Editor**: Vditor 3.10+
-- **Mind Map**: markmap
-- **i18n**: next-intl
-- **Storage**: Supabase (optional) / In-memory
-- **Deployment**: Vercel
+#### Online Usage
 
-### 📦 Installation
+Visit [cafe-md.t445481611.workers.dev](https://cafe-md.t445481611.workers.dev) to use instantly, no installation needed.
+
+#### Local Development
 
 ```bash
 # Clone the repository
-git clone <your-repo-url>
+git clone https://github.com/kael-odin/cafe-md.git
 cd cafe-md
 
 # Install dependencies
@@ -198,40 +174,43 @@ npm run dev
 
 Visit http://localhost:3000
 
-### 🚀 Quick Start
+### 📦 Browser Extension
 
-1. **Edit Markdown**: Write or paste content directly in the editor
-2. **Import File**: Drag and drop local .md files into the editor
-3. **Switch Theme**: Click the theme selector in the top right
-4. **Switch Language**: Click the language selector in the top right
-5. **Generate Mind Map**: Click the "Mind Map" button in the toolbar
-6. **Share Document**: Click the "Share" button to generate a share link
+Drag .md files to browser to open and edit.
+
+**Installation**:
+1. Download the `extension` folder
+2. Open `chrome://extensions/`
+3. Enable "Developer mode"
+4. Click "Load unpacked"
+5. Select the `extension` folder
+
+See [extension/README.md](extension/README.md) for details.
+
+### 🛠️ Tech Stack
+
+- **Framework**: Next.js 15.2 (App Router)
+- **Language**: TypeScript 5
+- **Styling**: Tailwind CSS 4
+- **Editor**: Vditor 3.11
+- **Mind Map**: markmap
+- **i18n**: next-intl
+- **Storage**: Supabase
+- **Deployment**: Cloudflare Workers
 
 ### 📝 Roadmap
 
-#### V1.0 (Current) ✅
 - [x] Vditor editor integration
 - [x] Chinese/English i18n
-- [x] Theme switching
-- [x] Local file drag & drop
-- [x] localStorage auto-save
-- [x] Share feature (in-memory)
-- [x] Mind map generation
-- [x] Export functionality
-
-#### V2.0 (Planned)
-- [ ] Supabase persistent storage
-- [ ] User system
+- [x] Dark mode
+- [x] Cloud sharing (public/private)
+- [x] Image upload
+- [x] Mind map
+- [x] Multi-format export
+- [x] Browser extension
+- [ ] User system (optional)
 - [ ] Document management
-- [ ] Version history
-- [ ] Cloud image upload
-- [ ] AI integration
-
-#### V3.0 (Future)
-- [ ] Team collaboration
-- [ ] Real-time collaborative editing
-- [ ] Self-hosted deployment
-- [ ] Commercial features
+- [ ] AI writing assistant
 
 ### 🤝 Contributing
 
@@ -239,18 +218,25 @@ Issues and Pull Requests are welcome!
 
 ### 📄 License
 
-MIT License
+[MIT License](LICENSE)
 
 ---
 
-## 🙏 致谢 / Acknowledgments
+## 🙏 Acknowledgments
 
-- [Vditor](https://github.com/Vanessa219/vditor) - 强大的 Markdown 编辑器
-- [markmap](https://github.com/markmap/markmap) - Markdown 思维导图
-- [Next.js](https://nextjs.org/) - React 框架
-- [Tailwind CSS](https://tailwindcss.com/) - CSS 框架
-- [next-intl](https://next-intl-docs.vercel.app/) - 国际化方案
+- [Vditor](https://github.com/Vanessa219/vditor) - Powerful Markdown editor
+- [markmap](https://github.com/markmap/markmap) - Markdown mind map
+- [Next.js](https://nextjs.org/) - React framework
+- [Tailwind CSS](https://tailwindcss.com/) - CSS framework
+- [Supabase](https://supabase.com/) - Backend as a Service
+- [Cloudflare Workers](https://workers.cloudflare.com/) - Edge computing
 
 ---
 
-**Made with ❤️ by Cafe MD Team**
+<div align="center">
+
+**Made with ❤️ by [kael-odin](https://github.com/kael-odin)**
+
+⭐ If you like this project, please give it a star! ⭐
+
+</div>

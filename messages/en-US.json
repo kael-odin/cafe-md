@@ -45,7 +45,12 @@
     "exportHtml": "HTML Page",
     "exportMd": "Markdown File",
     "exportText": "Plain Text",
-    "exportWechat": "WeChat Style"
+    "exportWechat": "WeChat Style",
+    "help": "Help",
+    "mdSyntaxCN": "Markdown 语法",
+    "mdSyntaxEN": "Markdown Syntax",
+    "diagram": "Diagram",
+    "math": "Math"
   },
   "share": {
     "title": "Share Document",

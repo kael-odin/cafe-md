@@ -45,7 +45,12 @@
     "exportHtml": "HTML 页面",
     "exportMd": "Markdown 文件",
     "exportText": "纯文本",
-    "exportWechat": "微信样式"
+    "exportWechat": "微信样式",
+    "help": "帮助",
+    "mdSyntaxCN": "Markdown 语法",
+    "mdSyntaxEN": "Markdown Syntax",
+    "diagram": "图表",
+    "math": "数学公式"
   },
   "share": {
     "title": "分享文档",

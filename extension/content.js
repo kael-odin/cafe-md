@@ -48,9 +48,24 @@ function isMarkdownFile(file) {
   return validExtensions.some(ext => name.endsWith(ext));
 }
 
-function openInCafeMD(content) {
-  const encodedContent = encodeURIComponent(content);
-  window.open(`${CAFE_MD_URL}/zh-CN?content=${encodedContent}`, '_blank');
+function openInCafeMD(content, filename) {
+  try {
+    sessionStorage.setItem('cafe-md-content', content);
+    if (filename) {
+      sessionStorage.setItem('cafe-md-filename', filename);
+    }
+    const win = window.open(`${CAFE_MD_URL}/zh-CN?from=extension`, '_blank');
+    if (!win) {
+      alert('Please allow popups for this extension to work');
+    }
+  } catch (e) {
+    console.error('Cafe MD: Failed to open', e);
+    if (content.length < 2000) {
+      window.open(`${CAFE_MD_URL}/zh-CN?content=${encodeURIComponent(content)}`, '_blank');
+    } else {
+      alert('Content too large. Please try a smaller file.');
+    }
+  }
 }
 
 function handleDragEnter(e) {
@@ -93,7 +108,7 @@ function handleDrop(e) {
       if (isMarkdownFile(file)) {
         const reader = new FileReader();
         reader.onload = (event) => {
-          openInCafeMD(event.target.result);
+          openInCafeMD(event.target.result, file.name);
         };
         reader.onerror = () => {
           console.error('Cafe MD: Failed to read file');

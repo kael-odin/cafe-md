@@ -262,8 +262,19 @@ export default function VditorEditor() {
     if (!mounted || !vditorRef.current) return;
 
     const urlContent = searchParams.get('content');
+    const fromExtension = searchParams.get('from') === 'extension';
+    
+    let extensionContent = null;
+    if (fromExtension && typeof window !== 'undefined') {
+      extensionContent = sessionStorage.getItem('cafe-md-content');
+      if (extensionContent) {
+        sessionStorage.removeItem('cafe-md-content');
+        sessionStorage.removeItem('cafe-md-filename');
+      }
+    }
+    
     const savedContent = loadFromLocalStorage();
-    const initialContent = urlContent ? decodeURIComponent(urlContent) : savedContent;
+    const initialContent = extensionContent || (urlContent ? decodeURIComponent(urlContent) : savedContent);
 
     vditorInstance.current = new Vditor(vditorRef.current, {
       height: '100%',
