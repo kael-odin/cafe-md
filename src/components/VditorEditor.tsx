@@ -292,7 +292,6 @@ export default function VditorEditor() {
       },
       customWysiwygToolbar: () => [],
       toolbar: [
-        'emoji',
         'headings',
         'bold',
         'italic',
@@ -319,8 +318,6 @@ export default function VditorEditor() {
         'edit-mode',
         'fullscreen',
         'preview',
-        'outline',
-        'export',
       ],
       input: (value) => {
         setContent(value);

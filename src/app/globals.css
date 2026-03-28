@@ -44,12 +44,15 @@ body {
 }
 
 .vditor-toolbar {
-  position: sticky !important;
-  top: 48px !important;
+  position: relative !important;
+  top: 0 !important;
   z-index: 5 !important;
-  border-bottom: 1px solid #e5e7eb !important;
-  background: #ffffff !important;
-  padding: 8px 12px !important;
+  border-bottom: none !important;
+  background: transparent !important;
+  padding: 0 !important;
+  display: inline-flex !important;
+  flex-wrap: nowrap !important;
+  align-items: center !important;
 }
 
 .vditor-toolbar .vditor-panel {
@@ -74,8 +77,8 @@ body {
 }
 
 .dark .vditor-toolbar {
-  border-bottom: 1px solid #3f3f46 !important;
-  background: #18181b !important;
+  border-bottom: none !important;
+  background: transparent !important;
 }
 
 .dark .vditor-toolbar__item {
@@ -116,6 +119,14 @@ body {
 }
 
 .vditor-toolbar__item[data-type="more"] {
+  display: none !important;
+}
+
+.vditor-toolbar__item[data-type="outline"] {
+  display: none !important;
+}
+
+.vditor-toolbar__item[data-type="export"] {
   display: none !important;
 }
 
