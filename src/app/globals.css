@@ -468,12 +468,12 @@ body {
 }
 
 .dark .vditor-outline__item {
-  color: #c4c4c8 !important;
+  color: #e8e8ec !important;
   font-weight: 500 !important;
 }
 
 .dark .vditor-outline__item:hover {
-  background: #2a2a2f !important;
+  background: #2d2d32 !important;
   border-left-color: #60a5fa !important;
   color: #ffffff !important;
 }
@@ -485,8 +485,26 @@ body {
 }
 
 .dark .vditor-outline__item--current {
-  color: #60a5fa !important;
+  color: #93c5fd !important;
   background: #1e3a5f !important;
   border-left-color: #60a5fa !important;
   font-weight: 600 !important;
+}
+
+/* 暗色模式下大纲标题文字增强 */
+.dark .vditor-outline .vditor-outline__title {
+  color: #f0f0f5 !important;
+}
+
+/* 暗色模式下大纲所有文字 */
+.dark .vditor-outline * {
+  color: #e0e0e5 !important;
+}
+
+.dark .vditor-outline a {
+  color: #93c5fd !important;
+}
+
+.dark .vditor-outline a:hover {
+  color: #bfdbfe !important;
 }
