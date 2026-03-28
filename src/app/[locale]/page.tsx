@@ -1,3 +1,4 @@
+import { Suspense } from 'react';
 import HomeClient from './HomeClient';
 
 export function generateStaticParams() {
@@ -8,5 +9,13 @@ export function generateStaticParams() {
 }
 
 export default function Home() {
-  return <HomeClient />;
+  return (
+    <Suspense fallback={
+      <div className="flex items-center justify-center h-screen">
+        <div className="text-zinc-500">Loading...</div>
+      </div>
+    }>
+      <HomeClient />
+    </Suspense>
+  );
 }

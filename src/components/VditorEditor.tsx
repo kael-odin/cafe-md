@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState, useCallback } from 'react';
+import { useSearchParams } from 'next/navigation';
 import Vditor from 'vditor';
 import 'vditor/dist/index.css';
 import { useTranslations, useLocale } from 'next-intl';
@@ -17,6 +18,7 @@ const GUIDE_SHOWN_KEY = 'cafe-md-guide-shown';
 export default function VditorEditor() {
   const t = useTranslations();
   const locale = useLocale();
+  const searchParams = useSearchParams();
   const vditorRef = useRef<HTMLDivElement>(null);
   const vditorInstance = useRef<Vditor | null>(null);
   const [content, setContent] = useState('');
@@ -259,13 +261,15 @@ export default function VditorEditor() {
   useEffect(() => {
     if (!mounted || !vditorRef.current) return;
 
+    const urlContent = searchParams.get('content');
     const savedContent = loadFromLocalStorage();
+    const initialContent = urlContent ? decodeURIComponent(urlContent) : savedContent;
 
     vditorInstance.current = new Vditor(vditorRef.current, {
       height: '100%',
       mode: editMode,
       placeholder: t('editor.placeholder'),
-      value: savedContent,
+      value: initialContent,
       theme: 'classic',
       lang: locale === 'en-US' ? 'en_US' : 'zh_CN',
       cache: {
@@ -452,7 +456,7 @@ export default function VditorEditor() {
         vditorInstance.current = null;
       }
     };
-  }, [mounted, showOutline, editMode, locale, t, loadFromLocalStorage, saveToLocalStorage, compressAndUploadImage]);
+  }, [mounted, showOutline, editMode, locale, t, loadFromLocalStorage, saveToLocalStorage, compressAndUploadImage, searchParams]);
 
   const switchEditMode = useCallback((mode: 'ir' | 'sv' | 'wysiwyg') => {
     setEditMode(mode);
