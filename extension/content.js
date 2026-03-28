@@ -32,12 +32,12 @@ function createOverlay() {
     </div>
   `;
   
-  document.documentElement.appendChild(overlay);
+  document.body.appendChild(overlay);
 }
 
 function removeOverlay() {
-  if (overlay) {
-    overlay.remove();
+  if (overlay && overlay.parentNode) {
+    overlay.parentNode.removeChild(overlay);
     overlay = null;
   }
 }
@@ -48,70 +48,159 @@ function isMarkdownFile(file) {
   return validExtensions.some(ext => name.endsWith(ext));
 }
 
-function compress(str) {
-  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=';
-  let result = '';
-  let i = 0;
+function showPreview(content, filename) {
+  const previewHtml = `
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>${filename} - Cafe MD Preview</title>
+  <link rel="stylesheet" href="https://unpkg.com/vditor@3.10.4/dist/index.css" />
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #f8fafc;
+      min-height: 100vh;
+    }
+    .toolbar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 52px;
+      background: #fff;
+      border-bottom: 1px solid #e2e8f0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 20px;
+      z-index: 1000;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+    }
+    .toolbar-left { display: flex; align-items: center; gap: 12px; }
+    .logo { font-size: 24px; }
+    .filename { font-weight: 600; color: #1e293b; font-size: 15px; }
+    .toolbar-right { display: flex; align-items: center; gap: 10px; }
+    .btn {
+      padding: 8px 16px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 500;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .btn-primary { background: #3b82f6; color: white; }
+    .btn-primary:hover { background: #2563eb; }
+    .btn-secondary { background: #f1f5f9; color: #475569; }
+    .btn-secondary:hover { background: #e2e8f0; }
+    .main {
+      margin-top: 52px;
+      padding: 32px;
+      max-width: 900px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .preview {
+      background: #fff;
+      border-radius: 12px;
+      padding: 32px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+      min-height: calc(100vh - 116px);
+    }
+    .loading { text-align: center; padding: 48px; color: #94a3b8; }
+    .vditor-reset { background: transparent !important; }
+  </style>
+</head>
+<body>
+  <div class="toolbar">
+    <div class="toolbar-left">
+      <span class="logo">☕</span>
+      <span class="filename">${filename}</span>
+    </div>
+    <div class="toolbar-right">
+      <button class="btn btn-secondary" id="copyBtn">📋 复制内容</button>
+      <button class="btn btn-secondary" id="downloadBtn">⬇️ 下载</button>
+      <button class="btn btn-primary" id="openOnlineBtn">🌐 在线编辑</button>
+    </div>
+  </div>
+  <div class="main">
+    <div id="preview" class="preview vditor-reset">
+      <div class="loading">正在渲染...</div>
+    </div>
+  </div>
+  <script src="https://unpkg.com/vditor@3.10.4/dist/index.min.js"></script>
+  <script>
+    (function() {
+      var content = ${JSON.stringify(content)};
+      
+      Vditor.preview(document.getElementById('preview'), content, {
+        cdn: 'https://unpkg.com/vditor@3.10.4',
+        mode: 'light',
+        markdown: { toc: true, mark: true, footnotes: true, autoSpace: true },
+        math: { inlineDigit: true, engine: 'KaTeX' },
+        hljs: { enable: true, lineNumber: true },
+      });
+      
+      document.getElementById('copyBtn').onclick = function() {
+        navigator.clipboard.writeText(content).then(function() {
+          alert('内容已复制到剪贴板！');
+        });
+      };
+      
+      document.getElementById('downloadBtn').onclick = function() {
+        var blob = new Blob([content], { type: 'text/markdown' });
+        var url = URL.createObjectURL(blob);
+        var a = document.createElement('a');
+        a.href = url;
+        a.download = '${filename}';
+        a.click();
+        URL.revokeObjectURL(url);
+      };
+      
+      document.getElementById('openOnlineBtn').onclick = function() {
+        var win = window.open('${CAFE_MD_URL}/zh-CN', '_blank');
+        if (win) {
+          win.onload = function() {
+            try {
+              win.localStorage.setItem('cafe-md-content', content);
+              win.localStorage.setItem('cafe-md-filename', '${filename}');
+            } catch(e) {}
+          };
+        }
+      };
+    })();
+  </script>
+</body>
+</html>`;
   
-  const utf8 = unescape(encodeURIComponent(str));
-  
-  while (i < utf8.length) {
-    const c1 = utf8.charCodeAt(i++);
-    const c2 = i < utf8.length ? utf8.charCodeAt(i++) : 0;
-    const c3 = i < utf8.length ? utf8.charCodeAt(i++) : 0;
-    
-    const e1 = c1 >> 2;
-    const e2 = ((c1 & 3) << 4) | (c2 >> 4);
-    const e3 = ((c2 & 15) << 2) | (c3 >> 6);
-    const e4 = c3 & 63;
-    
-    result += chars.charAt(e1) + chars.charAt(e2) + chars.charAt(e3) + chars.charAt(e4);
-  }
-  
-  return result;
+  const newDoc = document.open('text/html', '_blank');
+  newDoc.write(previewHtml);
+  newDoc.close();
 }
 
 function openInCafeMD(content, filename) {
-  try {
-    if (content.length < 1500) {
-      const encoded = encodeURIComponent(content);
-      window.open(`${CAFE_MD_URL}/zh-CN?content=${encoded}`, '_blank');
-    } else {
-      const compressed = btoa(unescape(encodeURIComponent(content)));
-      const chunkSize = 1800;
-      
-      if (compressed.length <= chunkSize) {
-        window.open(`${CAFE_MD_URL}/zh-CN?data=${compressed}`, '_blank');
-      } else {
-        const chunks = [];
-        for (let i = 0; i < compressed.length; i += chunkSize) {
-          chunks.push(compressed.slice(i, i + chunkSize));
-        }
-        
-        const key = 'cafe-md-' + Date.now();
-        const chunkData = {};
-        chunks.forEach((chunk, i) => {
-          chunkData[`${key}-${i}`] = chunk;
-        });
-        chunkData[`${key}-total`] = chunks.length;
-        chunkData[`${key}-filename`] = filename || 'document.md';
-        
-        chrome.storage.local.set(chunkData, () => {
-          window.open(`${CAFE_MD_URL}/zh-CN?chunk=${key}`, '_blank');
-        });
-      }
-    }
-  } catch (e) {
-    console.error('Cafe MD: Failed to open', e);
-    window.open(CAFE_MD_URL, '_blank');
+  if (content.length < 800) {
+    const encoded = encodeURIComponent(content);
+    window.open(CAFE_MD_URL + '/zh-CN?content=' + encoded, '_blank');
+  } else {
+    showPreview(content, filename || 'document.md');
   }
 }
 
 function handleDragEnter(e) {
-  if (e.dataTransfer && e.dataTransfer.types && e.dataTransfer.types.includes('Files')) {
-    e.preventDefault();
-    e.stopPropagation();
-    createOverlay();
+  if (e.dataTransfer && e.dataTransfer.types) {
+    const types = Array.from(e.dataTransfer.types);
+    if (types.includes('Files')) {
+      e.preventDefault();
+      e.stopPropagation();
+      createOverlay();
+    }
   }
 }
 
@@ -119,7 +208,9 @@ function handleDragOver(e) {
   if (overlay) {
     e.preventDefault();
     e.stopPropagation();
-    e.dataTransfer.dropEffect = 'copy';
+    if (e.dataTransfer) {
+      e.dataTransfer.dropEffect = 'copy';
+    }
   }
 }
 
@@ -127,7 +218,7 @@ function handleDragLeave(e) {
   if (overlay) {
     e.preventDefault();
     e.stopPropagation();
-    if (e.target === overlay || !overlay.contains(e.relatedTarget)) {
+    if (!e.relatedTarget || !overlay.contains(e.relatedTarget)) {
       removeOverlay();
     }
   }
@@ -140,19 +231,21 @@ function handleDrop(e) {
   e.stopPropagation();
   removeOverlay();
   
-  const files = e.dataTransfer.files;
-  
-  if (files && files.length > 0) {
-    for (const file of files) {
+  if (e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+    const files = e.dataTransfer.files;
+    
+    for (let i = 0; i < files.length; i++) {
+      const file = files[i];
       if (isMarkdownFile(file)) {
         const reader = new FileReader();
-        reader.onload = (event) => {
+        reader.onload = function(event) {
           openInCafeMD(event.target.result, file.name);
         };
-        reader.onerror = () => {
+        reader.onerror = function() {
           console.error('Cafe MD: Failed to read file');
         };
         reader.readAsText(file);
+        break;
       }
     }
   }

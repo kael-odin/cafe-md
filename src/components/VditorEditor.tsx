@@ -276,6 +276,15 @@ export default function VditorEditor() {
       }
     }
     
+    if (!decodedContent && typeof window !== 'undefined') {
+      const extensionContent = localStorage.getItem('cafe-md-content');
+      if (extensionContent) {
+        decodedContent = extensionContent;
+        localStorage.removeItem('cafe-md-content');
+        localStorage.removeItem('cafe-md-filename');
+      }
+    }
+    
     const savedContent = loadFromLocalStorage();
     const initialContent = decodedContent || savedContent;
 
