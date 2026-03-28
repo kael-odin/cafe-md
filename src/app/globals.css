@@ -105,6 +105,34 @@ body {
   color: #e4e4e7 !important;
 }
 
+/* 所见即所得模式暗色背景 */
+.vditor-wysiwyg {
+  background: #ffffff !important;
+  color: #1f2937 !important;
+}
+
+.dark .vditor-wysiwyg {
+  background: #18181b !important;
+  color: #e4e4e7 !important;
+}
+
+.dark .vditor-wysiwyg .vditor-reset {
+  background: #18181b !important;
+  color: #e4e4e7 !important;
+}
+
+.dark .vditor-wysiwyg pre,
+.dark .vditor-wysiwyg code {
+  background: #27272a !important;
+  color: #e4e4e7 !important;
+}
+
+.dark .vditor-wysiwyg blockquote {
+  background: #27272a !important;
+  border-left-color: #3b82f6 !important;
+  color: #d4d4d8 !important;
+}
+
 /* Markdown 内容样式 */
 .vditor-reset {
   font-family: var(--font-sans), system-ui, -apple-system, sans-serif !important;
