@@ -21,6 +21,7 @@ export default function VditorEditor() {
   const searchParams = useSearchParams();
   const vditorRef = useRef<HTMLDivElement>(null);
   const vditorInstance = useRef<Vditor | null>(null);
+  const dropzoneShown = useRef(false);
   const [content, setContent] = useState('');
   const [showMindmap, setShowMindmap] = useState(false);
   const [showShare, setShowShare] = useState(false);
@@ -474,16 +475,23 @@ export default function VditorEditor() {
 
   const handleDragOver = useCallback((e: React.DragEvent) => {
     e.preventDefault();
-    setShowDropzone(true);
+    if (!dropzoneShown.current) {
+      dropzoneShown.current = true;
+      setShowDropzone(true);
+    }
   }, []);
 
   const handleDragLeave = useCallback((e: React.DragEvent) => {
     e.preventDefault();
-    setShowDropzone(false);
+    if (dropzoneShown.current) {
+      dropzoneShown.current = false;
+      setShowDropzone(false);
+    }
   }, []);
 
   const handleDrop = useCallback(async (e: React.DragEvent) => {
     e.preventDefault();
+    dropzoneShown.current = false;
     setShowDropzone(false);
     
     const file = e.dataTransfer.files[0];
@@ -821,9 +829,6 @@ export default function VditorEditor() {
         onClear={handleClear}
         onSaveLocal={handleSaveToLocal}
         showOutline={showOutline}
-        vditor={vditorInstance.current}
-        editMode={editMode}
-        onSwitchMode={switchEditMode}
       />
       <div ref={vditorRef} className="h-[calc(100%-48px)]" />
       
