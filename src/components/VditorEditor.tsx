@@ -506,19 +506,63 @@ export default function VditorEditor() {
     if (format === 'docx') {
       try {
         const html = vditorInstance.current.getHTML();
-        const response = await fetch('/api/export/docx', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ html }),
+        const { Document, Packer, Paragraph, TextRun, HeadingLevel, ImageRun, Table, TableRow, TableCell, WidthType, BorderStyle } = await import('docx');
+        const { htmlToText } = await import('html-to-text');
+        
+        const textContent = htmlToText(html, {
+          wordwrap: false,
+          selectors: [
+            { selector: 'h1', options: { leadingLineBreaks: 1, trailingLineBreaks: 1 } },
+            { selector: 'h2', options: { leadingLineBreaks: 1, trailingLineBreaks: 1 } },
+            { selector: 'h3', options: { leadingLineBreaks: 1, trailingLineBreaks: 1 } },
+            { selector: 'p', options: { leadingLineBreaks: 1, trailingLineBreaks: 1 } },
+            { selector: 'li', options: { leadingLineBreaks: 0, trailingLineBreaks: 0 } },
+          ],
         });
 
-        if (!response.ok) {
-          throw new Error('Failed to generate DOCX');
+        const lines = textContent.split('\n');
+        const children: InstanceType<typeof Paragraph>[] = [];
+
+        for (const line of lines) {
+          if (!line.trim()) {
+            children.push(new Paragraph({ children: [] }));
+            continue;
+          }
+
+          if (line.startsWith('# ')) {
+            children.push(new Paragraph({
+              text: line.slice(2),
+              heading: HeadingLevel.HEADING_1,
+            }));
+          } else if (line.startsWith('## ')) {
+            children.push(new Paragraph({
+              text: line.slice(3),
+              heading: HeadingLevel.HEADING_2,
+            }));
+          } else if (line.startsWith('### ')) {
+            children.push(new Paragraph({
+              text: line.slice(4),
+              heading: HeadingLevel.HEADING_3,
+            }));
+          } else if (line.startsWith('    ') || line.startsWith('\t')) {
+            children.push(new Paragraph({
+              children: [new TextRun({ text: line, font: 'Courier New', size: 20 })],
+            }));
+          } else {
+            children.push(new Paragraph({
+              children: [new TextRun({ text: line })],
+            }));
+          }
         }
 
-        const blob = await response.blob();
+        const doc = new Document({
+          sections: [{
+            properties: {},
+            children,
+          }],
+        });
+
+        const blob = await Packer.toBlob(doc);
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
@@ -527,7 +571,7 @@ export default function VditorEditor() {
         URL.revokeObjectURL(url);
       } catch (error) {
         console.error('DOCX export error:', error);
-        alert('Failed to export DOCX');
+        alert('Failed to export DOCX. Please try HTML format instead.');
       }
       return;
     }
