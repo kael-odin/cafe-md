@@ -1,29 +1,24 @@
 declare module 'html-to-docx' {
-  interface TableOptions {
-    row?: {
-      cantSplit?: boolean;
-    };
-  }
-
   interface HTMLtoDOCXOptions {
-    orientation?: 'portrait' | 'landscape';
+    table?: {
+      row?: {
+        cantSplit?: boolean;
+      };
+    };
+    footer?: boolean;
+    header?: boolean;
     margins?: {
       top?: number;
       right?: number;
       bottom?: number;
       left?: number;
     };
-    title?: string;
-    table?: TableOptions;
-    footer?: boolean;
-    header?: boolean;
   }
-
+  
   function HTMLtoDOCX(
     htmlString: string,
-    headerHTMLString?: string | null,
-    options?: HTMLtoDOCXOptions,
-    footerHTMLString?: string | null
+    headerHTMLString: string | null,
+    options?: HTMLtoDOCXOptions
   ): Promise<Blob>;
   
   export default HTMLtoDOCX;

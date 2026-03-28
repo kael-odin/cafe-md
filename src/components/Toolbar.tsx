@@ -71,7 +71,7 @@ export default function Toolbar({
   };
 
   return (
-    <div className="flex items-center justify-between px-4 py-2 border-b border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900">
+    <div className="sticky top-0 z-20 flex items-center justify-between px-4 py-2 border-b border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900">
       <div className="flex items-center gap-1">
         <div className="relative group">
           <button

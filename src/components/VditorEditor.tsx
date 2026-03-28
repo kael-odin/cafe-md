@@ -506,65 +506,116 @@ export default function VditorEditor() {
     if (format === 'docx') {
       try {
         const html = vditorInstance.current.getHTML();
-        const { Document, Packer, Paragraph, TextRun, HeadingLevel, ImageRun, Table, TableRow, TableCell, WidthType, BorderStyle } = await import('docx');
-        const { htmlToText } = await import('html-to-text');
+        const { Document, Packer, Paragraph, TextRun, HeadingLevel, AlignmentType } = await import('docx');
         
-        const textContent = htmlToText(html, {
-          wordwrap: false,
-          selectors: [
-            { selector: 'h1', options: { leadingLineBreaks: 1, trailingLineBreaks: 1 } },
-            { selector: 'h2', options: { leadingLineBreaks: 1, trailingLineBreaks: 1 } },
-            { selector: 'h3', options: { leadingLineBreaks: 1, trailingLineBreaks: 1 } },
-            { selector: 'p', options: { leadingLineBreaks: 1, trailingLineBreaks: 1 } },
-            { selector: 'li', options: { leadingLineBreaks: 0, trailingLineBreaks: 0 } },
-          ],
-        });
-
-        const lines = textContent.split('\n');
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(`<div>${html}</div>`, 'text/html');
+        const body = doc.body.firstChild as HTMLElement;
+        
         const children: InstanceType<typeof Paragraph>[] = [];
-
-        for (const line of lines) {
-          if (!line.trim()) {
-            children.push(new Paragraph({ children: [] }));
-            continue;
+        
+        const processNode = (node: Node) => {
+          if (node.nodeType === Node.TEXT_NODE) {
+            const text = node.textContent || '';
+            if (text.trim()) {
+              return [new TextRun({ text })];
+            }
+            return [];
           }
-
-          if (line.startsWith('# ')) {
-            children.push(new Paragraph({
-              text: line.slice(2),
-              heading: HeadingLevel.HEADING_1,
-            }));
-          } else if (line.startsWith('## ')) {
-            children.push(new Paragraph({
-              text: line.slice(3),
-              heading: HeadingLevel.HEADING_2,
-            }));
-          } else if (line.startsWith('### ')) {
-            children.push(new Paragraph({
-              text: line.slice(4),
-              heading: HeadingLevel.HEADING_3,
-            }));
-          } else if (line.startsWith('    ') || line.startsWith('\t')) {
-            children.push(new Paragraph({
-              children: [new TextRun({ text: line, font: 'Courier New', size: 20 })],
-            }));
-          } else {
-            children.push(new Paragraph({
-              children: [new TextRun({ text: line })],
-            }));
+          
+          if (node.nodeType !== Node.ELEMENT_NODE) return [];
+          
+          const element = node as HTMLElement;
+          const tagName = element.tagName.toLowerCase();
+          
+          const childRuns: InstanceType<typeof TextRun>[] = [];
+          element.childNodes.forEach(child => {
+            childRuns.push(...processNode(child) as InstanceType<typeof TextRun>[]);
+          });
+          
+          switch (tagName) {
+            case 'h1':
+              children.push(new Paragraph({
+                children: [new TextRun({ text: element.textContent || '', bold: true, size: 48 })],
+                heading: HeadingLevel.HEADING_1,
+                spacing: { before: 240, after: 120 },
+              }));
+              return [];
+            case 'h2':
+              children.push(new Paragraph({
+                children: [new TextRun({ text: element.textContent || '', bold: true, size: 36 })],
+                heading: HeadingLevel.HEADING_2,
+                spacing: { before: 200, after: 100 },
+              }));
+              return [];
+            case 'h3':
+              children.push(new Paragraph({
+                children: [new TextRun({ text: element.textContent || '', bold: true, size: 28 })],
+                heading: HeadingLevel.HEADING_3,
+                spacing: { before: 160, after: 80 },
+              }));
+              return [];
+            case 'p':
+              children.push(new Paragraph({
+                children: childRuns.length > 0 ? childRuns : [new TextRun({ text: '' })],
+                spacing: { after: 120 },
+              }));
+              return [];
+            case 'strong':
+            case 'b':
+              return [new TextRun({ text: element.textContent || '', bold: true })];
+            case 'em':
+            case 'i':
+              return [new TextRun({ text: element.textContent || '', italics: true })];
+            case 'code':
+              return [new TextRun({ text: element.textContent || '', font: 'Courier New', shading: { fill: 'E5E5E5' } })];
+            case 'pre':
+              const codeText = element.textContent || '';
+              codeText.split('\n').forEach(line => {
+                children.push(new Paragraph({
+                  children: [new TextRun({ text: line, font: 'Courier New', size: 20 })],
+                  shading: { fill: 'F5F5F5' },
+                }));
+              });
+              return [];
+            case 'blockquote':
+              children.push(new Paragraph({
+                children: [new TextRun({ text: element.textContent || '', italics: true })],
+                indent: { left: 720 },
+                shading: { fill: 'F5F5F5' },
+              }));
+              return [];
+            case 'ul':
+            case 'ol':
+              element.querySelectorAll('li').forEach(li => {
+                children.push(new Paragraph({
+                  children: [new TextRun({ text: `• ${li.textContent}` })],
+                  indent: { left: 360 },
+                }));
+              });
+              return [];
+            case 'br':
+              children.push(new Paragraph({ children: [] }));
+              return [];
+            case 'a':
+              return [new TextRun({ text: element.textContent || '', color: '0066CC', underline: {} })];
+            default:
+              return childRuns;
           }
-        }
-
-        const doc = new Document({
+        };
+        
+        body.childNodes.forEach(node => processNode(node));
+        
+        const docxDocument = new Document({
           sections: [{
             properties: {},
-            children,
+            children: children.length > 0 ? children : [new Paragraph({ children: [new TextRun({ text: '' })] })],
           }],
         });
 
-        const blob = await Packer.toBlob(doc);
+        const blob = await Packer.toBlob(docxDocument);
         const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
+        const a = window.document.createElement('a');
         a.href = url;
         a.download = 'document.docx';
         a.click();
