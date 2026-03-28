@@ -465,7 +465,7 @@ export default function VditorEditor() {
 
   const switchEditMode = useCallback((mode: 'ir' | 'sv' | 'wysiwyg') => {
     if (vditorInstance.current) {
-      vditorInstance.current.setMode(mode);
+      (vditorInstance.current as any).setMode(mode);
       setEditMode(mode);
     }
   }, []);
