@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cafe MD - Drop File</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      color: white;
+    }
+    .container { text-align: center; padding: 40px; }
+    .logo { font-size: 80px; margin-bottom: 20px; }
+    h1 { font-size: 32px; margin-bottom: 10px; }
+    p { font-size: 18px; opacity: 0.9; margin-bottom: 30px; }
+    .dropzone {
+      width: 400px;
+      height: 200px;
+      border: 3px dashed rgba(255,255,255,0.5);
+      border-radius: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s;
+      background: rgba(255,255,255,0.1);
+      cursor: pointer;
+    }
+    .dropzone:hover, .dropzone.dragover {
+      border-color: white;
+      background: rgba(255,255,255,0.2);
+      transform: scale(1.05);
+    }
+    .dropzone-icon { font-size: 48px; margin-bottom: 10px; }
+    .dropzone-text { font-size: 16px; }
+    .hint { margin-top: 30px; font-size: 14px; opacity: 0.7; }
+    a { color: white; }
+    .btn {
+      margin-top: 20px;
+      padding: 12px 24px;
+      background: white;
+      color: #667eea;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-block;
+    }
+    .btn:hover { opacity: 0.9; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="logo">☕</div>
+    <h1>Cafe MD</h1>
+    <p>Markdown 在线编辑器</p>
+    
+    <div class="dropzone" id="dropzone">
+      <div class="dropzone-icon">📄</div>
+      <div class="dropzone-text">拖拽 .md 文件到这里</div>
+    </div>
+    
+    <a href="https://cafe-md.t445481611.workers.dev" target="_blank" class="btn">打开在线编辑器</a>
+    
+    <p class="hint">支持 .md .markdown .txt 文件</p>
+  </div>
+  
+  <script>
+    const CAFE_MD_URL = 'https://cafe-md.t445481611.workers.dev';
+    const dropzone = document.getElementById('dropzone');
+    
+    function isMarkdownFile(file) {
+      const validExtensions = ['.md', '.markdown', '.txt'];
+      const name = file.name.toLowerCase();
+      return validExtensions.some(ext => name.endsWith(ext));
+    }
+    
+    function openInCafeMD(content, filename) {
+      if (content.length < 1500) {
+        const encoded = encodeURIComponent(content);
+        window.open(`${CAFE_MD_URL}/zh-CN?content=${encoded}`, '_blank');
+      } else {
+        const compressed = btoa(unescape(encodeURIComponent(content)));
+        window.open(`${CAFE_MD_URL}/zh-CN?data=${compressed}`, '_blank');
+      }
+    }
+    
+    dropzone.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      dropzone.classList.add('dragover');
+    });
+    
+    dropzone.addEventListener('dragleave', () => {
+      dropzone.classList.remove('dragover');
+    });
+    
+    dropzone.addEventListener('drop', (e) => {
+      e.preventDefault();
+      dropzone.classList.remove('dragover');
+      
+      const files = e.dataTransfer.files;
+      for (const file of files) {
+        if (isMarkdownFile(file)) {
+          const reader = new FileReader();
+          reader.onload = (event) => {
+            openInCafeMD(event.target.result, file.name);
+          };
+          reader.readAsText(file);
+        }
+      }
+    });
+    
+    dropzone.addEventListener('click', () => {
+      const input = document.createElement('input');
+      input.type = 'file';
+      input.accept = '.md,.markdown,.txt';
+      input.onchange = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+          const reader = new FileReader();
+          reader.onload = (event) => {
+            openInCafeMD(event.target.result, file.name);
+          };
+          reader.readAsText(file);
+        }
+      };
+      input.click();
+    });
+  </script>
+</body>
+</html>

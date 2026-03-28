@@ -56,6 +56,22 @@ cd cafe-md/extension
    - 点击「加载解压缩的扩展」
    - 选择 `extension` 文件夹
 
+## 设置浏览器主页（可选）
+
+### 方法一：设置启动页
+
+1. 打开 Chrome 设置：`chrome://settings/`
+2. 找到「启动时」
+3. 选择「打开特定网页」
+4. 点击「添加新网页」
+5. 输入：`file:///D:/path/to/cafe-md/extension/launcher.html`
+   （将路径替换为你的实际路径）
+
+### 方法二：使用 New Tab Redirect 扩展
+
+1. 安装 [New Tab Redirect](https://chrome.google.com/webstore/detail/new-tab-redirect) 扩展
+2. 设置重定向 URL 为本地文件路径
+
 ## 使用方法
 
 ### 方法一：拖拽文件（推荐）
@@ -72,6 +88,11 @@ cd cafe-md/extension
 - 在网页中选中任意文本
 - 右键 → 「Open with Cafe MD」
 - 选中的内容会在编辑器中打开
+
+### 方法四：设置浏览器主页
+- 按照「设置浏览器主页」步骤设置
+- 每次打开浏览器或新标签页都会显示拖拽页面
+- 直接拖拽文件即可打开
 
 ## 支持的文件类型
 
@@ -111,5 +132,5 @@ cd cafe-md/extension
 ## 隐私说明
 
 - 扩展只在拖拽文件时读取文件内容
-- 文件内容通过 sessionStorage 传递给 Cafe MD
+- 文件内容通过 URL 参数传递给 Cafe MD
 - 不会收集或上传任何用户数据
