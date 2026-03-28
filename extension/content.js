@@ -7,38 +7,32 @@ function createOverlay() {
   
   overlay = document.createElement('div');
   overlay.id = 'cafe-md-drop-overlay';
+  overlay.style.cssText = `
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(59, 130, 246, 0.95);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 2147483647;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  `;
+  
   overlay.innerHTML = `
-    <div style="
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: rgba(59, 130, 246, 0.9);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      z-index: 2147483647;
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    ">
-      <div style="
-        font-size: 64px;
-        margin-bottom: 20px;
-      ">📄</div>
-      <div style="
-        font-size: 24px;
-        color: white;
-        font-weight: 600;
-        margin-bottom: 10px;
-      ">Drop to open with Cafe MD</div>
-      <div style="
-        font-size: 16px;
-        color: rgba(255, 255, 255, 0.8);
-      ">Markdown files (.md, .markdown, .txt)</div>
+    <div style="font-size: 80px; margin-bottom: 24px;">📄</div>
+    <div style="font-size: 28px; color: white; font-weight: 600; margin-bottom: 12px;">
+      Drop to open with Cafe MD
+    </div>
+    <div style="font-size: 16px; color: rgba(255, 255, 255, 0.85);">
+      Markdown files (.md, .markdown, .txt)
     </div>
   `;
-  document.body.appendChild(overlay);
+  
+  document.documentElement.appendChild(overlay);
 }
 
 function removeOverlay() {
@@ -59,50 +53,60 @@ function openInCafeMD(content) {
   window.open(`${CAFE_MD_URL}/zh-CN?content=${encodedContent}`, '_blank');
 }
 
-document.addEventListener('dragenter', (e) => {
-  if (e.dataTransfer.types.includes('Files')) {
+function handleDragEnter(e) {
+  if (e.dataTransfer && e.dataTransfer.types && e.dataTransfer.types.includes('Files')) {
     e.preventDefault();
+    e.stopPropagation();
     createOverlay();
   }
-});
+}
 
-document.addEventListener('dragover', (e) => {
+function handleDragOver(e) {
   if (overlay) {
     e.preventDefault();
+    e.stopPropagation();
     e.dataTransfer.dropEffect = 'copy';
   }
-});
+}
 
-document.addEventListener('dragleave', (e) => {
-  if (overlay && !e.relatedTarget) {
-    removeOverlay();
+function handleDragLeave(e) {
+  if (overlay) {
+    e.preventDefault();
+    e.stopPropagation();
+    if (e.target === overlay || !overlay.contains(e.relatedTarget)) {
+      removeOverlay();
+    }
   }
-});
+}
 
-document.addEventListener('drop', (e) => {
+function handleDrop(e) {
   if (!overlay) return;
   
   e.preventDefault();
+  e.stopPropagation();
   removeOverlay();
   
   const files = e.dataTransfer.files;
   
-  for (const file of files) {
-    if (isMarkdownFile(file)) {
-      const reader = new FileReader();
-      reader.onload = (event) => {
-        openInCafeMD(event.target.result);
-      };
-      reader.readAsText(file);
-    }
-  }
-});
-
-if (document.readyState === 'complete') {
-  if (document.body && document.body.textContent.trim()) {
-    const content = document.body.textContent;
-    if (content.length > 50 && content.length < 100000) {
-      console.log('Cafe MD: Page content detected, you can open it with the extension');
+  if (files && files.length > 0) {
+    for (const file of files) {
+      if (isMarkdownFile(file)) {
+        const reader = new FileReader();
+        reader.onload = (event) => {
+          openInCafeMD(event.target.result);
+        };
+        reader.onerror = () => {
+          console.error('Cafe MD: Failed to read file');
+        };
+        reader.readAsText(file);
+      }
     }
   }
 }
+
+document.addEventListener('dragenter', handleDragEnter, true);
+document.addEventListener('dragover', handleDragOver, true);
+document.addEventListener('dragleave', handleDragLeave, true);
+document.addEventListener('drop', handleDrop, true);
+
+console.log('Cafe MD Extension loaded - drag & drop enabled');
