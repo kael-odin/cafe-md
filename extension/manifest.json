@@ -19,22 +19,18 @@
   "background": {
     "service_worker": "background.js"
   },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content.js"],
+      "run_at": "document_start"
+    }
+  ],
   "permissions": [
-    "contextMenus"
+    "contextMenus",
+    "activeTab"
   ],
   "host_permissions": [
     "file:///*"
-  ],
-  "file_browser_handlers": [
-    {
-      "id": "cafe-md-open",
-      "default_title": "Open with Cafe MD",
-      "file_filters": [
-        {
-          "name": "Markdown Files",
-          "extensions": ["md", "markdown", "txt"]
-        }
-      ]
-    }
   ]
 }
