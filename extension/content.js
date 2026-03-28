@@ -48,23 +48,62 @@ function isMarkdownFile(file) {
   return validExtensions.some(ext => name.endsWith(ext));
 }
 
+function compress(str) {
+  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=';
+  let result = '';
+  let i = 0;
+  
+  const utf8 = unescape(encodeURIComponent(str));
+  
+  while (i < utf8.length) {
+    const c1 = utf8.charCodeAt(i++);
+    const c2 = i < utf8.length ? utf8.charCodeAt(i++) : 0;
+    const c3 = i < utf8.length ? utf8.charCodeAt(i++) : 0;
+    
+    const e1 = c1 >> 2;
+    const e2 = ((c1 & 3) << 4) | (c2 >> 4);
+    const e3 = ((c2 & 15) << 2) | (c3 >> 6);
+    const e4 = c3 & 63;
+    
+    result += chars.charAt(e1) + chars.charAt(e2) + chars.charAt(e3) + chars.charAt(e4);
+  }
+  
+  return result;
+}
+
 function openInCafeMD(content, filename) {
   try {
-    sessionStorage.setItem('cafe-md-content', content);
-    if (filename) {
-      sessionStorage.setItem('cafe-md-filename', filename);
-    }
-    const win = window.open(`${CAFE_MD_URL}/zh-CN?from=extension`, '_blank');
-    if (!win) {
-      alert('Please allow popups for this extension to work');
+    if (content.length < 1500) {
+      const encoded = encodeURIComponent(content);
+      window.open(`${CAFE_MD_URL}/zh-CN?content=${encoded}`, '_blank');
+    } else {
+      const compressed = btoa(unescape(encodeURIComponent(content)));
+      const chunkSize = 1800;
+      
+      if (compressed.length <= chunkSize) {
+        window.open(`${CAFE_MD_URL}/zh-CN?data=${compressed}`, '_blank');
+      } else {
+        const chunks = [];
+        for (let i = 0; i < compressed.length; i += chunkSize) {
+          chunks.push(compressed.slice(i, i + chunkSize));
+        }
+        
+        const key = 'cafe-md-' + Date.now();
+        const chunkData = {};
+        chunks.forEach((chunk, i) => {
+          chunkData[`${key}-${i}`] = chunk;
+        });
+        chunkData[`${key}-total`] = chunks.length;
+        chunkData[`${key}-filename`] = filename || 'document.md';
+        
+        chrome.storage.local.set(chunkData, () => {
+          window.open(`${CAFE_MD_URL}/zh-CN?chunk=${key}`, '_blank');
+        });
+      }
     }
   } catch (e) {
     console.error('Cafe MD: Failed to open', e);
-    if (content.length < 2000) {
-      window.open(`${CAFE_MD_URL}/zh-CN?content=${encodeURIComponent(content)}`, '_blank');
-    } else {
-      alert('Content too large. Please try a smaller file.');
-    }
+    window.open(CAFE_MD_URL, '_blank');
   }
 }
 
