@@ -10,6 +10,7 @@ interface ShareData {
   content: string;
   expires_at: string | null;
   is_public: boolean;
+  password: string | null;
   created_at: string;
 }
 
@@ -20,6 +21,9 @@ function ShareContent() {
   const [shareData, setShareData] = useState<ShareData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [needsPassword, setNeedsPassword] = useState(false);
+  const [inputPassword, setInputPassword] = useState('');
+  const [passwordError, setPasswordError] = useState(false);
   const previewRef = useRef<HTMLDivElement>(null);
 
   const handleDownload = (format: 'md' | 'html' | 'txt') => {
@@ -78,6 +82,18 @@ ${previewRef.current.innerHTML}
     URL.revokeObjectURL(url);
   };
 
+  const handlePasswordSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!shareData || !inputPassword) return;
+    
+    if (inputPassword === shareData.password) {
+      setNeedsPassword(false);
+      setPasswordError(false);
+    } else {
+      setPasswordError(true);
+    }
+  };
+
   useEffect(() => {
     const fetchShare = async () => {
       if (!slug) {
@@ -95,7 +111,7 @@ ${previewRef.current.innerHTML}
       try {
         const { data, error: fetchError } = await supabase
           .from('shares')
-          .select('content, expires_at, is_public, created_at')
+          .select('content, expires_at, is_public, password, created_at')
           .eq('slug', slug)
           .single();
 
@@ -109,7 +125,12 @@ ${previewRef.current.innerHTML}
           return;
         }
 
-        setShareData(data);
+        if (data.password) {
+          setShareData(data);
+          setNeedsPassword(true);
+        } else {
+          setShareData(data);
+        }
       } catch (err) {
         setError('Failed to load document');
       } finally {
@@ -121,7 +142,7 @@ ${previewRef.current.innerHTML}
   }, [slug]);
 
   useEffect(() => {
-    if (!shareData || !previewRef.current) return;
+    if (!shareData || !previewRef.current || needsPassword) return;
 
     Vditor.preview(previewRef.current, shareData.content, {
       cdn: 'https://unpkg.com/vditor@3.10.4',
@@ -141,7 +162,7 @@ ${previewRef.current.innerHTML}
         lineNumber: true,
       },
     });
-  }, [shareData]);
+  }, [shareData, needsPassword]);
 
   if (loading) {
     return (
@@ -161,6 +182,45 @@ ${previewRef.current.innerHTML}
           <p className="text-zinc-600 dark:text-zinc-400">
             This document may have been deleted or expired.
           </p>
+        </div>
+      </div>
+    );
+  }
+
+  if (needsPassword && shareData) {
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-zinc-50 dark:bg-zinc-950">
+        <div className="bg-white dark:bg-zinc-900 rounded-lg shadow-lg p-8 w-full max-w-md">
+          <div className="text-center mb-6">
+            <div className="text-4xl mb-4">🔒</div>
+            <h1 className="text-xl font-semibold text-zinc-900 dark:text-zinc-100">
+              Password Protected
+            </h1>
+            <p className="text-zinc-600 dark:text-zinc-400 mt-2">
+              This document is password protected. Please enter the password to view.
+            </p>
+          </div>
+          <form onSubmit={handlePasswordSubmit}>
+            <input
+              type="password"
+              value={inputPassword}
+              onChange={(e) => setInputPassword(e.target.value)}
+              placeholder="Enter password"
+              className={`w-full px-4 py-3 bg-white dark:bg-zinc-800 border ${
+                passwordError ? 'border-red-500' : 'border-zinc-200 dark:border-zinc-700'
+              } rounded-lg text-zinc-900 dark:text-zinc-100 mb-2`}
+              autoFocus
+            />
+            {passwordError && (
+              <p className="text-red-500 text-sm mb-4">Incorrect password. Please try again.</p>
+            )}
+            <button
+              type="submit"
+              className="w-full py-3 bg-blue-500 hover:bg-blue-600 text-white rounded-lg font-medium"
+            >
+              Unlock Document
+            </button>
+          </form>
         </div>
       </div>
     );
