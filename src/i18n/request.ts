@@ -13,3 +13,6 @@ export default getRequestConfig(async ({ requestLocale }) => {
     messages: (await import(`../../messages/${locale}.json`)).default
   };
 });
+
+export const dynamic = 'force-static';
+export const dynamicParams = true;

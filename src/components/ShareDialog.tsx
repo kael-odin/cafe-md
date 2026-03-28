@@ -2,6 +2,8 @@
 
 import { useState } from 'react';
 import { useTranslations } from 'next-intl';
+import { supabase } from '@/lib/supabase';
+import { nanoid } from 'nanoid';
 
 interface ShareDialogProps {
   content: string;
@@ -17,24 +19,31 @@ export default function ShareDialog({ content, onClose }: ShareDialogProps) {
   const [copied, setCopied] = useState(false);
 
   const handleShare = async () => {
+    if (!supabase) {
+      alert('Supabase not configured. Please set up environment variables.');
+      return;
+    }
+
     setLoading(true);
     try {
-      const response = await fetch('/api/share', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
+      const slug = nanoid(8);
+      
+      const expiresAt = expiresIn === 'never' 
+        ? null 
+        : new Date(Date.now() + parseInt(expiresIn) * 24 * 60 * 60 * 1000).toISOString();
+
+      const { error } = await supabase
+        .from('shares')
+        .insert({
+          slug,
           content,
-          expiresIn: expiresIn === 'never' ? null : parseInt(expiresIn),
-          isPublic,
-        }),
-      });
+          is_public: isPublic,
+          expires_at: expiresAt,
+        });
 
-      if (!response.ok) throw new Error('Failed to create share');
+      if (error) throw error;
 
-      const data = await response.json();
-      setShareUrl(`${window.location.origin}/s/${data.slug}`);
+      setShareUrl(`${window.location.origin}/s?slug=${slug}`);
     } catch (error) {
       console.error('Share error:', error);
       alert(t('error'));

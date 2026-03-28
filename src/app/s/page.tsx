@@ -1,21 +1,22 @@
 'use client';
 
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState, useRef, Suspense } from 'react';
+import { useSearchParams } from 'next/navigation';
 import Vditor from 'vditor';
 import 'vditor/dist/index.css';
-
-interface SharePageClientProps {
-  slug: string;
-}
+import { supabase } from '@/lib/supabase';
 
 interface ShareData {
   content: string;
-  expiresAt: string | null;
-  isPublic: boolean;
-  createdAt: string;
+  expires_at: string | null;
+  is_public: boolean;
+  created_at: string;
 }
 
-export default function SharePageClient({ slug }: SharePageClientProps) {
+function ShareContent() {
+  const searchParams = useSearchParams();
+  const slug = searchParams.get('slug');
+  
   const [shareData, setShareData] = useState<ShareData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -23,20 +24,35 @@ export default function SharePageClient({ slug }: SharePageClientProps) {
 
   useEffect(() => {
     const fetchShare = async () => {
+      if (!slug) {
+        setError('No share ID provided');
+        setLoading(false);
+        return;
+      }
+
+      if (!supabase) {
+        setError('Supabase not configured');
+        setLoading(false);
+        return;
+      }
+
       try {
-        const response = await fetch(`/api/share?slug=${slug}`);
-        if (!response.ok) {
-          if (response.status === 404) {
-            setError('Document not found');
-          } else if (response.status === 410) {
-            setError('This share link has expired');
-          } else {
-            setError('Failed to load document');
-          }
+        const { data, error: fetchError } = await supabase
+          .from('shares')
+          .select('content, expires_at, is_public, created_at')
+          .eq('slug', slug)
+          .single();
+
+        if (fetchError || !data) {
+          setError('Document not found');
           return;
         }
 
-        const data = await response.json();
+        if (data.expires_at && new Date(data.expires_at) < new Date()) {
+          setError('This share link has expired');
+          return;
+        }
+
         setShareData(data);
       } catch (err) {
         setError('Failed to load document');
@@ -102,9 +118,9 @@ export default function SharePageClient({ slug }: SharePageClientProps) {
             <h1 className="text-xl font-semibold text-zinc-900 dark:text-zinc-100">
               Shared Document
             </h1>
-            {shareData?.createdAt && (
+            {shareData?.created_at && (
               <p className="text-sm text-zinc-500 dark:text-zinc-400 mt-1">
-                Created: {new Date(shareData.createdAt).toLocaleString()}
+                Created: {new Date(shareData.created_at).toLocaleString()}
               </p>
             )}
           </div>
@@ -112,5 +128,17 @@ export default function SharePageClient({ slug }: SharePageClientProps) {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function SharePage() {
+  return (
+    <Suspense fallback={
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-zinc-500">Loading...</div>
+      </div>
+    }>
+      <ShareContent />
+    </Suspense>
   );
 }

@@ -4,6 +4,7 @@ import { useEffect, useRef, useState, useCallback } from 'react';
 import Vditor from 'vditor';
 import 'vditor/dist/index.css';
 import { useTranslations, useLocale } from 'next-intl';
+import { supabase } from '@/lib/supabase';
 import Toolbar from './Toolbar';
 import MindmapModal from './MindmapModal';
 import ShareDialog from './ShareDialog';
@@ -75,23 +76,38 @@ export default function VditorEditor() {
       const compressedFile = await imageCompression(file, options);
       setUploadProgress(40);
       
-      const formData = new FormData();
-      formData.append('file', compressedFile);
-      
-      const response = await fetch('/api/upload/image', {
-        method: 'POST',
-        body: formData,
-      });
-      
-      if (!response.ok) {
-        throw new Error('Upload failed');
+      if (!supabase) {
+        const reader = new FileReader();
+        return new Promise((resolve) => {
+          reader.onload = (e) => {
+            resolve(e.target?.result as string);
+          };
+          reader.readAsDataURL(compressedFile);
+        });
       }
+
+      const fileName = `images/${Date.now()}-${file.name}`;
       
+      const { data, error } = await supabase.storage
+        .from('images')
+        .upload(fileName, compressedFile, {
+          cacheControl: '3600',
+          upsert: false,
+        });
+
+      if (error) {
+        throw error;
+      }
+
       setUploadProgress(90);
-      const { url } = await response.json();
+      
+      const { data: urlData } = supabase.storage
+        .from('images')
+        .getPublicUrl(data.path);
+      
       setUploadProgress(100);
       
-      return url;
+      return urlData.publicUrl;
     } catch (error) {
       console.error('Image upload error:', error);
       const reader = new FileReader();

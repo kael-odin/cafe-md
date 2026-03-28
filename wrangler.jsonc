@@ -1,0 +1,15 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "main": ".open-next/worker.js",
+  "name": "cafe-md",
+  "compatibility_date": "2026-03-28",
+  "compatibility_flags": ["nodejs_compat"],
+  "assets": {
+    "directory": ".open-next/assets",
+    "binding": "ASSETS"
+  },
+  "vars": {
+    "NEXT_PUBLIC_SUPABASE_URL": "https://swuwlubjayyduhpfngaj.supabase.co",
+    "NEXT_PUBLIC_SUPABASE_ANON_KEY": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN3dXdsdWJqYXl5ZHVocGZuZ2FqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ2NDE2NDQsImV4cCI6MjA5MDIxNzY0NH0.Egn9AqaVvK62clZfkWTYHvfFX2cdykVPyaVcirRd7HU"
+  }
+}
