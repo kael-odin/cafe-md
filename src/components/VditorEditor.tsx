@@ -21,7 +21,7 @@ export default function VditorEditor() {
   const searchParams = useSearchParams();
   const vditorRef = useRef<HTMLDivElement>(null);
   const vditorInstance = useRef<Vditor | null>(null);
-  const dropzoneShown = useRef(false);
+  const dragCounter = useRef(0);
   const [content, setContent] = useState('');
   const [showMindmap, setShowMindmap] = useState(false);
   const [showShare, setShowShare] = useState(false);
@@ -470,29 +470,39 @@ export default function VditorEditor() {
 
 
 
-  const handleDragOver = useCallback((e: React.DragEvent) => {
+  const handleDragEnter = useCallback((e: React.DragEvent) => {
     e.preventDefault();
-    if (!dropzoneShown.current) {
-      dropzoneShown.current = true;
+    e.stopPropagation();
+    dragCounter.current++;
+    if (dragCounter.current === 1) {
       setShowDropzone(true);
     }
   }, []);
 
+  const handleDragOver = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+  }, []);
+
   const handleDragLeave = useCallback((e: React.DragEvent) => {
     e.preventDefault();
-    if (dropzoneShown.current) {
-      dropzoneShown.current = false;
+    e.stopPropagation();
+    dragCounter.current--;
+    if (dragCounter.current === 0) {
       setShowDropzone(false);
     }
   }, []);
 
   const handleDrop = useCallback(async (e: React.DragEvent) => {
     e.preventDefault();
-    dropzoneShown.current = false;
+    e.stopPropagation();
+    dragCounter.current = 0;
     setShowDropzone(false);
     
-    const file = e.dataTransfer.files[0];
-    if (!file) return;
+    const files = e.dataTransfer.files;
+    if (!files || files.length === 0) return;
+
+    const file = files[0];
 
     if (file.type.startsWith('image/')) {
       const url = await compressAndUploadImage(file);
@@ -774,9 +784,10 @@ export default function VditorEditor() {
   return (
     <div
       className="h-full w-full relative"
-      onDrop={handleDrop}
+      onDragEnter={handleDragEnter}
       onDragOver={handleDragOver}
       onDragLeave={handleDragLeave}
+      onDrop={handleDrop}
     >
       {uploading && (
         <div className="absolute top-0 left-0 right-0 z-20 bg-blue-500 text-white py-2 px-4 text-center text-sm">
@@ -818,6 +829,8 @@ export default function VditorEditor() {
         </div>
       )}
       
+      <div ref={vditorRef} className="h-[calc(100%-96px)]" />
+      
       <Toolbar
         onExport={handleExport}
         onShare={() => setShowShare(true)}
@@ -827,7 +840,6 @@ export default function VditorEditor() {
         onSaveLocal={handleSaveToLocal}
         showOutline={showOutline}
       />
-      <div ref={vditorRef} className="h-[calc(100%-48px)]" />
       
       {showMindmap && (
         <MindmapModal
