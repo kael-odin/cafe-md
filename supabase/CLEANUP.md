@@ -1,5 +1,13 @@
 # 图片清理机制
 
+## 清理策略
+
+| 策略 | 触发条件 | 说明 |
+|------|----------|------|
+| **过期清理** | 每天凌晨3点 | 清理已过期的分享及其图片 |
+| **定期清理** | 每周日凌晨4点 | 清理30天前的图片 |
+| **存储满清理** | 存储超过75%时 | 删除最旧的1/4图片 |
+
 ## 方案一：Supabase pg_cron（推荐）
 
 Supabase 内置了 pg_cron 扩展，可以定期执行清理任务。
@@ -27,6 +35,13 @@ SELECT cron.schedule(
   '0 4 * * 0',
   'SELECT cleanup_old_images(30);'
 );
+
+-- 每小时检查存储是否满，满了就清理
+SELECT cron.schedule(
+  'cleanup-when-full',
+  '0 * * * *',
+  'SELECT cleanup_when_full();'
+);
 ```
 
 ### 查看已设置的定时任务
@@ -40,6 +55,7 @@ SELECT * FROM cron.job;
 ```sql
 SELECT cron.unschedule('cleanup-expired-shares');
 SELECT cron.unschedule('cleanup-old-images');
+SELECT cron.unschedule('cleanup-when-full');
 ```
 
 ## 方案二：手动清理
@@ -55,6 +71,9 @@ SELECT cleanup_old_images(30);
 
 -- 清理 7 天前的图片（更激进）
 SELECT cleanup_old_images(7);
+
+-- 存储满时自动清理最旧的1/4
+SELECT cleanup_when_full();
 ```
 
 ## 存储监控
@@ -71,6 +90,9 @@ SELECT COUNT(*) FROM shares;
 -- 查看过期分享数量
 SELECT COUNT(*) FROM shares 
 WHERE expires_at IS NOT NULL AND expires_at < NOW();
+
+-- 查看存储大小（字节）
+SELECT SUM(size) FROM storage.objects WHERE bucket_id = 'images';
 ```
 
 ## Supabase 免费额度提醒

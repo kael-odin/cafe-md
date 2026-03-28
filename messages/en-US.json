@@ -109,6 +109,8 @@
     "exportTitle": "Multi-format Export",
     "exportDesc": "Export to HTML, Markdown, PDF, DOCX and other formats",
     "shareTitle": "Cloud Sharing",
-    "shareDesc": "Generate share links to easily share your documents with others"
+    "shareDesc": "Generate share links to easily share your documents with others",
+    "securityTitle": "Data Security",
+    "securityDesc": "Your documents are stored locally in your browser. Only uploaded images are stored in the cloud."
   }
 }

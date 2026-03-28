@@ -259,7 +259,7 @@ body {
 }
 
 .dark .vditor-reset table {
-  background: #18181b !important;
+  background: #1f1f23 !important;
   border-color: #3f3f46 !important;
 }
 
@@ -268,7 +268,7 @@ body {
 }
 
 .dark .vditor-reset table thead {
-  background: #27272a !important;
+  background: #2d2d32 !important;
 }
 
 .vditor-reset table th {
@@ -280,8 +280,9 @@ body {
 }
 
 .dark .vditor-reset table th {
-  color: #fafafa !important;
-  border-bottom-color: #3f3f46 !important;
+  color: #f0f0f0 !important;
+  border-bottom-color: #52525b !important;
+  background: #2d2d32 !important;
 }
 
 .vditor-reset table td {
@@ -293,6 +294,7 @@ body {
 .dark .vditor-reset table td {
   border-bottom-color: #3f3f46 !important;
   color: #d4d4d8 !important;
+  background: #1f1f23 !important;
 }
 
 .vditor-reset table tbody tr:hover {
@@ -300,7 +302,7 @@ body {
 }
 
 .dark .vditor-reset table tbody tr:hover {
-  background: #27272a !important;
+  background: #2a2a2f !important;
 }
 
 .vditor-reset hr {
@@ -447,15 +449,16 @@ body {
 }
 
 .dark .vditor-outline {
-  background: #18181b !important;
+  background: #1a1a1d !important;
   border-right: 1px solid #3f3f46 !important;
 }
 
 .vditor-outline__item {
   color: #1f2937 !important;
-  padding: 4px 8px !important;
-  border-left: 2px solid transparent !important;
+  padding: 6px 12px !important;
+  border-left: 3px solid transparent !important;
   transition: all 0.2s !important;
+  font-size: 14px !important;
 }
 
 .vditor-outline__item:hover {
@@ -465,12 +468,12 @@ body {
 }
 
 .dark .vditor-outline__item {
-  color: #e5e7eb !important;
+  color: #c4c4c8 !important;
   font-weight: 500 !important;
 }
 
 .dark .vditor-outline__item:hover {
-  background: #27272a !important;
+  background: #2a2a2f !important;
   border-left-color: #60a5fa !important;
   color: #ffffff !important;
 }

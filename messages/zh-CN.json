@@ -109,6 +109,8 @@
     "exportTitle": "多格式导出",
     "exportDesc": "支持导出为 HTML、Markdown、PDF、DOCX 等多种格式",
     "shareTitle": "云端分享",
-    "shareDesc": "生成分享链接，轻松分享你的文档给他人"
+    "shareDesc": "生成分享链接，轻松分享你的文档给他人",
+    "securityTitle": "数据安全",
+    "securityDesc": "你的文档内容仅保存在本地浏览器，图片上传后存储在云端，安全可靠"
   }
 }

@@ -23,7 +23,7 @@ CREATE POLICY "Allow public insert" ON images
 CREATE POLICY "Allow public read" ON images
   FOR SELECT USING (true);
 
--- 4. 创建清理过期分享的函数
+-- 4. 清理过期分享的函数
 CREATE OR REPLACE FUNCTION cleanup_expired_shares()
 RETURNS void AS $$
 DECLARE
@@ -46,7 +46,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
--- 5. 创建清理旧图片的函数（保留最近30天的图片）
+-- 5. 清理旧图片的函数（保留最近30天）
 CREATE OR REPLACE FUNCTION cleanup_old_images(days_to_keep INTEGER DEFAULT 30)
 RETURNS void AS $$
 BEGIN
@@ -56,6 +56,40 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
+-- 6. 存储满时清理旧图片的函数（删除最旧的1/4）
+CREATE OR REPLACE FUNCTION cleanup_when_full()
+RETURNS void AS $$
+DECLARE
+  total_size BIGINT;
+  max_size BIGINT := 1073741824; -- 1GB in bytes
+  delete_count INTEGER;
+BEGIN
+  -- 获取当前存储大小
+  SELECT COALESCE(SUM(size), 0) INTO total_size
+  FROM storage.objects 
+  WHERE bucket_id = 'images';
+  
+  -- 如果超过75%容量，删除最旧的1/4图片
+  IF total_size > (max_size * 0.75) THEN
+    -- 计算需要删除的数量
+    SELECT CEIL(COUNT(*)::NUMERIC / 4) INTO delete_count
+    FROM storage.objects 
+    WHERE bucket_id = 'images';
+    
+    -- 删除最旧的1/4图片
+    DELETE FROM storage.objects 
+    WHERE bucket_id = 'images'
+    AND id IN (
+      SELECT id FROM storage.objects 
+      WHERE bucket_id = 'images'
+      ORDER BY created_at ASC
+      LIMIT delete_count
+    );
+  END IF;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
 -- 手动执行清理（可选）
--- SELECT cleanup_expired_shares();
--- SELECT cleanup_old_images(30);
+-- SELECT cleanup_expired_shares();           -- 清理过期分享
+-- SELECT cleanup_old_images(30);              -- 清理30天前的图片
+-- SELECT cleanup_when_full();                 -- 存储满时清理

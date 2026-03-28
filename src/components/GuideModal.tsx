@@ -36,6 +36,12 @@ export default function GuideModal({ onClose }: GuideModalProps) {
       description: t('guide.shareDesc'),
       color: 'from-orange-500 to-red-500',
     },
+    {
+      icon: '🔒',
+      title: t('guide.securityTitle'),
+      description: t('guide.securityDesc'),
+      color: 'from-emerald-500 to-green-500',
+    },
   ];
 
   const handleNext = () => {
