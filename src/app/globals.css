@@ -52,12 +52,16 @@ body {
   padding: 8px 12px !important;
 }
 
-.dark .vditor-toolbar {
-  border-bottom: 1px solid #3f3f46 !important;
-  background: #18181b !important;
+.vditor-toolbar .vditor-panel {
+  z-index: 100 !important;
+  margin-top: 8px !important;
+  position: absolute !important;
+  top: 100% !important;
+  left: 0 !important;
 }
 
 .vditor-toolbar__item {
+  position: relative !important;
   color: #374151 !important;
   padding: 6px 8px !important;
   border-radius: 4px !important;
@@ -67,6 +71,11 @@ body {
 .vditor-toolbar__item:hover {
   background: #f3f4f6 !important;
   color: #111827 !important;
+}
+
+.dark .vditor-toolbar {
+  border-bottom: 1px solid #3f3f46 !important;
+  background: #18181b !important;
 }
 
 .dark .vditor-toolbar__item {
@@ -84,6 +93,38 @@ body {
 
 .dark .vditor-toolbar__item--current {
   background: #3f3f46 !important;
+}
+
+.vditor-toolbar__item .vditor-toolbar__sub {
+  z-index: 1000 !important;
+  position: absolute !important;
+  top: 100% !important;
+  left: 0 !important;
+  margin-top: 8px !important;
+}
+
+.vditor-tip {
+  z-index: 99999 !important;
+  position: fixed !important;
+  top: auto !important;
+  bottom: auto !important;
+  transform: none !important;
+}
+
+.vditor-tip--show {
+  display: block !important;
+}
+
+.vditor-toolbar__item:hover .vditor-tip {
+  top: 100% !important;
+  margin-top: 8px !important;
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+}
+
+.vditor-toolbar__item[data-type="more"],
+.vditor-toolbar__item:last-child:has(.vditor-toolbar__sub) {
+  display: none !important;
 }
 
 /* 编辑器内容区域 */

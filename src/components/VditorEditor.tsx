@@ -276,15 +276,6 @@ export default function VditorEditor() {
       }
     }
     
-    if (!decodedContent && typeof window !== 'undefined') {
-      const extensionContent = localStorage.getItem('cafe-md-content');
-      if (extensionContent) {
-        decodedContent = extensionContent;
-        localStorage.removeItem('cafe-md-content');
-        localStorage.removeItem('cafe-md-filename');
-      }
-    }
-    
     const savedContent = loadFromLocalStorage();
     const initialContent = decodedContent || savedContent;
 
@@ -326,18 +317,9 @@ export default function VditorEditor() {
         '|',
         'edit-mode',
         'fullscreen',
-        {
-          name: 'more',
-          toolbar: [
-            'both',
-            'preview',
-            'outline',
-            'export',
-            'devtools',
-            'info',
-            'help',
-          ],
-        },
+        'preview',
+        'outline',
+        'export',
       ],
       input: (value) => {
         setContent(value);
@@ -479,13 +461,12 @@ export default function VditorEditor() {
         vditorInstance.current = null;
       }
     };
-  }, [mounted, showOutline, editMode, locale, t, loadFromLocalStorage, saveToLocalStorage, compressAndUploadImage, searchParams]);
+  }, [mounted, locale, t, loadFromLocalStorage, saveToLocalStorage, compressAndUploadImage, searchParams]);
 
   const switchEditMode = useCallback((mode: 'ir' | 'sv' | 'wysiwyg') => {
-    setEditMode(mode);
     if (vditorInstance.current) {
-      vditorInstance.current.destroy();
-      vditorInstance.current = null;
+      vditorInstance.current.setMode(mode);
+      setEditMode(mode);
     }
   }, []);
 
