@@ -34,7 +34,7 @@
 | 🔗 **云端分享** | 生成公开/私密分享链接 |
 | 🗺️ **思维导图** | 一键生成并导出 SVG |
 | 🖼️ **图片上传** | 自动压缩并上传到云端 |
-| 🧩 **浏览器扩展** | 拖拽 .md 文件直接打开 |
+| 📂 **拖拽上传** | 拖拽 .md 文件直接打开编辑 |
 
 ### 🚀 快速开始
 
@@ -58,19 +58,6 @@ npm run dev
 
 访问 http://localhost:3000
 
-### 📦 浏览器扩展
-
-支持拖拽 .md 文件到浏览器直接打开编辑。
-
-**安装方法**：
-1. 下载 `extension` 文件夹
-2. 打开 `chrome://extensions/`
-3. 开启「开发者模式」
-4. 点击「加载已解压的扩展程序」
-5. 选择 `extension` 文件夹
-
-详见 [extension/README.md](extension/README.md)
-
 ### 🛠️ 技术栈
 
 - **框架**: Next.js 15.2 (App Router)
@@ -91,7 +78,6 @@ cafe-md/
 │   ├── components/       # React 组件
 │   ├── lib/              # 工具库
 │   └── i18n/             # 国际化配置
-├── extension/            # 浏览器扩展
 ├── messages/             # 语言文件
 ├── supabase/             # 数据库脚本
 └── public/               # 静态资源
@@ -115,7 +101,7 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
 - [x] 图片上传
 - [x] 思维导图
 - [x] 多格式导出
-- [x] 浏览器扩展
+- [x] 拖拽上传
 - [ ] 用户系统（可选）
 - [ ] 文档管理
 - [ ] AI 辅助写作
@@ -150,7 +136,7 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
 | 🔗 **Cloud Sharing** | Generate public/private share links |
 | 🗺️ **Mind Map** | One-click generation with SVG export |
 | 🖼️ **Image Upload** | Auto-compress and upload to cloud |
-| 🧩 **Browser Extension** | Drag .md files to open directly |
+| 📂 **Drag & Drop** | Drag .md files to open directly |
 
 ### 🚀 Quick Start
 
@@ -174,19 +160,6 @@ npm run dev
 
 Visit http://localhost:3000
 
-### 📦 Browser Extension
-
-Drag .md files to browser to open and edit.
-
-**Installation**:
-1. Download the `extension` folder
-2. Open `chrome://extensions/`
-3. Enable "Developer mode"
-4. Click "Load unpacked"
-5. Select the `extension` folder
-
-See [extension/README.md](extension/README.md) for details.
-
 ### 🛠️ Tech Stack
 
 - **Framework**: Next.js 15.2 (App Router)
@@ -207,7 +180,7 @@ See [extension/README.md](extension/README.md) for details.
 - [x] Image upload
 - [x] Mind map
 - [x] Multi-format export
-- [x] Browser extension
+- [x] Drag & drop upload
 - [ ] User system (optional)
 - [ ] Document management
 - [ ] AI writing assistant

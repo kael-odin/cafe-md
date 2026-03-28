@@ -41,15 +41,18 @@ body {
 .vditor {
   border: none !important;
   background: transparent !important;
+  display: flex !important;
+  flex-direction: column !important;
 }
 
 .vditor-toolbar {
   position: relative !important;
   top: 0 !important;
-  z-index: 5 !important;
+  z-index: 100 !important;
   border-bottom: 1px solid #e5e7eb !important;
   background: #ffffff !important;
   padding: 8px 12px !important;
+  flex-shrink: 0 !important;
 }
 
 .dark .vditor-toolbar {
@@ -108,11 +111,21 @@ body {
   z-index: 99999 !important;
 }
 
-.vditor-tooltipped__s::after,
-.vditor-tooltipped__se::after,
-.vditor-tooltipped__sw::after {
+/* 让 Vditor 工具栏的 tooltip 显示在下方 */
+.vditor-toolbar .vditor-tooltipped::after,
+.vditor-toolbar .vditor-tooltipped::before {
   top: 100% !important;
+  bottom: auto !important;
+}
+
+.vditor-toolbar .vditor-tooltipped::after {
   margin-top: 8px !important;
+  margin-bottom: 0 !important;
+}
+
+.vditor-toolbar .vditor-tooltipped::before {
+  margin-top: 8px !important;
+  margin-bottom: 0 !important;
 }
 
 .vditor-toolbar__item[data-type="more"] {
@@ -125,6 +138,11 @@ body {
 
 .vditor-toolbar__item[data-type="export"] {
   display: none !important;
+}
+
+.vditor-content {
+  flex: 1 !important;
+  min-height: 0 !important;
 }
 
 /* 编辑器内容区域 */

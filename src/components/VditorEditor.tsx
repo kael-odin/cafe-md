@@ -282,6 +282,7 @@ export default function VditorEditor() {
 
     vditorInstance.current = new Vditor(vditorRef.current, {
       height: '100%',
+      minHeight: 300,
       mode: editMode,
       placeholder: t('editor.placeholder'),
       value: initialContent,
@@ -291,6 +292,9 @@ export default function VditorEditor() {
         enable: false,
       },
       customWysiwygToolbar: () => [],
+      resize: {
+        enable: false,
+      },
       toolbar: [
         'headings',
         'bold',
@@ -375,7 +379,7 @@ export default function VditorEditor() {
         },
       },
       outline: {
-        enable: showOutline,
+        enable: true,
         position: 'left',
       },
       preview: {
@@ -415,9 +419,6 @@ export default function VditorEditor() {
         pin: false,
       },
       counter: {
-        enable: false,
-      },
-      resize: {
         enable: false,
       },
       after: () => {
@@ -748,7 +749,14 @@ export default function VditorEditor() {
   }, []);
 
   const toggleOutline = useCallback(() => {
-    setShowOutline(prev => !prev);
+    setShowOutline(prev => {
+      const newValue = !prev;
+      const outlineElement = document.querySelector('.vditor-outline');
+      if (outlineElement) {
+        (outlineElement as HTMLElement).style.display = newValue ? 'block' : 'none';
+      }
+      return newValue;
+    });
   }, []);
 
   useEffect(() => {
@@ -829,8 +837,6 @@ export default function VditorEditor() {
         </div>
       )}
       
-      <div ref={vditorRef} className="h-[calc(100%-96px)]" />
-      
       <Toolbar
         onExport={handleExport}
         onShare={() => setShowShare(true)}
@@ -840,6 +846,8 @@ export default function VditorEditor() {
         onSaveLocal={handleSaveToLocal}
         showOutline={showOutline}
       />
+      
+      <div ref={vditorRef} className="vditor-container flex-1" />
       
       {showMindmap && (
         <MindmapModal

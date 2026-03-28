@@ -41,7 +41,7 @@ export default function HomeClient() {
         </div>
       </header>
 
-      <main className="flex-1 overflow-hidden">
+      <main className="flex-1 overflow-hidden relative">
         <VditorEditor />
       </main>
     </div>
